@@ -248,9 +248,45 @@
   }
   .project-media img, .project-media video{ width:100%; height:100%; object-fit:cover; }
 
+  /* Project 01 gallery: paired files are shown together without cropping. */
+  .project-gallery{ position:relative; width:100%; margin-bottom:26px; }
+  .project-gallery .project-media{ margin-bottom:0; aspect-ratio:auto; height:clamp(300px, 48vw, 560px); min-height:0; }
+  .gallery-slide{ display:none; width:100%; height:100%; align-items:center; justify-content:center; gap:16px; }
+  .gallery-slide.is-active{ display:flex; }
+  .gallery-slide img{ width:100%; height:100%; max-width:100%; max-height:100%; object-fit:contain; cursor:zoom-in; }
+  .gallery-slide.is-pair img{ width:calc(50% - 8px); max-width:calc(50% - 8px); height:100%; }
+  .gallery-arrow{ position:absolute; top:50%; transform:translateY(-50%); z-index:1; width:42px; height:42px; border-radius:50%; border:1px solid var(--paper-dim); 
+    background:rgba(8,19,31,.38); color:var(--paper); cursor:pointer; display:grid; place-items:center; font-size:26px; line-height:1; 
+    transition:background .2s ease, border-color .2s ease, color .2s ease; }
+  .gallery-arrow:hover, .gallery-arrow:focus-visible{ background:rgba(8,19,31,.92); border-color:var(--teal); color:var(--teal); outline:none; }
+  .gallery-arrow.prev{ left:14px; }
+  .gallery-arrow.next{ right:14px; }
+  .gallery-pagination{ display:flex; align-items:center; justify-content:center; gap:9px; margin-top:14px; }
+  .gallery-dot{ width:9px; height:9px; padding:0; border:0; border-radius:50%; background:var(--paper-dim); opacity:.35; cursor:pointer; 
+    transition:opacity .2s ease, background .2s ease, transform .2s ease; }
+  .gallery-dot:hover, .gallery-dot:focus-visible{ opacity:.8; outline:1px solid var(--teal); outline-offset:3px; }
+  .gallery-dot.is-active{ background:var(--copper); opacity:1; transform:scale(1.2); }
+  .gallery-count{ margin-left:8px; color:var(--paper-dim); font:11px 'JetBrains Mono', monospace; }
+  .image-lightbox{ position:fixed; inset:0; z-index:200; display:none; align-items:center; justify-content:center; padding:64px 32px 32px; 
+    background:rgba(2,8,14,.92); cursor:zoom-out; }
+  .image-lightbox.is-open{ display:flex; }
+  .image-lightbox img{ max-width:100%; max-height:100%; object-fit:contain; transform:translate(0, 0) scale(1); transform-origin:center; 
+    transition:transform .12s ease-out; cursor:default; user-select:none; -webkit-user-drag:none; touch-action:none; }
+  .image-lightbox img.is-zoomed{ cursor:grab; }
+  .image-lightbox img.is-panning{ cursor:grabbing; transition:none; }
+  .lightbox-close{ position:absolute; top:18px; right:18px; width:42px; height:42px; border:1px solid var(--paper-dim); border-radius:50%; background:rgba(8,19,31,.5); 
+    color:var(--paper); font-size:28px; line-height:1; cursor:pointer; transition:background .2s ease, border-color .2s ease, color .2s ease; }
+  .lightbox-close:hover, .lightbox-close:focus-visible{ background:var(--navy-panel); border-color:var(--teal); color:var(--teal); outline:none; }
+  .lightbox-hint{ position:absolute; bottom:16px; left:50%; transform:translateX(-50%); margin:0; color:var(--paper-dim); font:11px 'JetBrains Mono', monospace; 
+  text-align:center; pointer-events:none; }
+  body.lightbox-open{ overflow:hidden; }
+  @media (max-width:640px){ .project-gallery .project-media{ height:clamp(320px, 85vw, 520px); padding:12px; } .gallery-slide.is-pair{ flex-direction:column; gap:10px; } 
+  .gallery-slide.is-pair img{ width:100%; max-width:100%; height:calc(50% - 5px); max-height:calc(50% - 5px); } .gallery-arrow{ width:36px; height:36px; } 
+  .gallery-arrow.prev{ left:8px; } .gallery-arrow.next{ right:8px; } }
+
   .project-body{ display:grid; grid-template-columns:1.5fr 1fr; gap:36px; }
   @media (max-width:760px){ .project-body{ grid-template-columns:1fr; } }
-  .project-body p{ color:var(--paper-dim); margin-bottom:14px; }
+  .project-body p{ color:var(--paper-dim); margin-bottom:14px; text-align:justify; }
   .project-body ul{ margin:0 0 14px; padding-left:18px; color:var(--paper-dim); }
   .project-body li{ margin-bottom:6px; }
 
@@ -357,7 +393,7 @@
       <div class="hero-meta">
         <div><strong>First-Class Honours</strong> Mechatronic Engineering</div>
         <div><strong>2 Internships</strong> Production &amp; <br> Technical Intern</div>
-        <div><strong>2 Flagship Projects</strong> AI + Embedded Systems</div>
+        <div><strong>2 Projects</strong> AI + Embedded Systems</div>
         <div><strong>Johor, Malaysia</strong> Open to relocate</div>
       </div>
     </div>
@@ -414,48 +450,113 @@
     <span class="b-tr"></span><span class="b-bl"></span>
     <div class="project-top">
       <div>
-        <span class="project-fig">FIG. 01 — GROUP PROJECT</span>
+        <span class="project-fig" id="elephantFigure">FIG. 01 — GROUP PROJECT</span>
         <h3>Automated Elephant Detection &amp; Early Warning System</h3>
       </div>
-      <span class="project-status">[ADD STATUS, e.g. Completed]</span>
+      <span class="project-status">[Completed]</span>
     </div>
 
-    <div class="project-media">
-      <!-- Replace this div's content with: <img src="your-image.jpg" alt="Project photo"> -->
-      [ADD PHOTO / DIAGRAM / DEMO GIF OF THE DEVICE HERE — e.g. the Raspberry Pi unit, a field
-      installation shot, or the detection dashboard]
+    <div class="project-gallery" id="elephantGallery" aria-label="Project 01 image gallery">
+      <div class="project-media">
+        <div class="gallery-slide is-active" data-figure="01" data-images="01" data-description=
+          "<p>An AI-based elephant detection device built on Raspberry Pi, combining image and 
+            audio classification to identify elephant presence and trigger an early-warning alert 
+            via API notification — aimed at reducing human-elephant conflict near plantations or 
+            rural roads.
+          </p>
+          <p>I led the mechanical design from 3D modelling and 3D printing through to a compact 
+            internal layout. The enclosure was designed for ventilation, waterproofing, modular 
+            assembly, and straightforward maintenance in outdoor deployment.
+          </p>
+          <ul>
+            <li>Optimised internal electronics for space efficiency and service access</li>
+            <li>Designed airflow and fan integration to manage heat within the enclosure</li>
+            <li>Built a modular, weather-resistant housing for field-ready operation</li>
+          </ul>">
+          <img src="Image/Y3GP/1_ImageDetection.jpg" 
+          alt="Elephant image-detection system">
+        </div>
+        <div class="gallery-slide" data-figure="02" data-images="02" data-description=
+          "<p>The mechanical design process translated the system requirements into a compact, 
+            manufacturable enclosure for the Raspberry Pi-based device.
+          </p>
+          <p>I developed and iterated the 3D model, using 3D-printed parts to validate component placement, 
+            cable routing, ventilation, weather protection, and access for maintenance. The 
+            final layout balanced thermal performance, waterproofing, and modular replacement.
+          </p>
+          <ul>
+            <li>Created a space-efficient internal component layout</li>
+            <li>Designed for rapid prototyping and iterative 3D-print validation</li>
+            <li>Integrated ventilation and sealing considerations into the enclosure</li>
+          </ul>">
+          <img src="Image/Y3GP/2_MechanicalDesign.png" 
+          alt="Mechanical design of the elephant detection device">
+        </div>
+        <div class="gallery-slide is-pair" data-figure="03" data-images="03–04" data-description=
+          "<p>The computer-vision pipeline was developed with YOLO to identify elephants from camera 
+            images at the edge.</p>
+          <p>I annotated the training data, trained and tested the detection model, then deployed it 
+            on a Raspberry Pi 5 for on-device inference. Accuracy testing and mechanical design analysis 
+            helped validate both the model performance and the physical implementation.
+          </p>
+          <ul>
+            <li>Annotated, trained, tested, and deployed a YOLO image-detection model</li>
+            <li>Implemented inference on Raspberry Pi 5 for edge operation</li>
+            <li>Evaluated model accuracy alongside the mechanical design</li>
+          </ul>">
+          <img src="Image/Y3GP/3_Accuracy.jpg" 
+          alt="YOLO image-detection accuracy results">
+          <img src="Image/Y3GP/3_MechanicalPlot.jpg" 
+          alt="Mechanical design analysis plot">
+        </div>
+        <div class="gallery-slide is-pair" data-figure="04" data-images="05–06" data-description=
+          "<p>The Raspberry Pi 5 coordinates the complete early-warning workflow, combining image and 
+            acoustic results before deciding whether to raise an alert.
+          </p>
+          <p>I implemented the system control flow, alert payload generation, and API integration, 
+            while considering power-saving behaviour for solar-powered operation. Detection events 
+            are logged and sent as actionable Telegram notifications for timely response.
+          </p>
+          <ul>
+            <li>Combined image and acoustic classification results in the decision flow</li>
+            <li>Sent alert payloads through an API and recorded detection events</li>
+            <li>Applied power optimisation for solar-powered deployment</li>
+          </ul>">
+          <img src="Image/Y3GP/4_DetectionLog.jpg" alt="Elephant detection event log">
+          <img src="Image/Y3GP/4_TelegramAlert.jpg" alt="Telegram early-warning alert">
+        </div>
+      </div>
+      <button class="gallery-arrow prev" type="button" aria-label="Previous project image">&#8249;</button>
+      <button class="gallery-arrow next" type="button" aria-label="Next project image">&#8250;</button>
+      <div class="gallery-pagination" aria-label="Choose project image">
+        <button class="gallery-dot is-active" data-slide="0" type="button" aria-label="Show image 1" aria-current="true"></button>
+        <button class="gallery-dot" data-slide="1" type="button" aria-label="Show image 2"></button>
+        <button class="gallery-dot" data-slide="2" type="button" aria-label="Show images 3 and 4"></button>
+        <button class="gallery-dot" data-slide="2" type="button" aria-label="Show images 3 and 4"></button>
+        <button class="gallery-dot" data-slide="3" type="button" aria-label="Show images 5 and 6"></button>
+        <button class="gallery-dot" data-slide="3" type="button" aria-label="Show images 5 and 6"></button>
+        <span class="gallery-count">01 / 06 images</span>
+      </div>
     </div>
 
     <div class="project-body">
-      <div>
-        <p>An AI-based elephant detection device built on Raspberry Pi, combining image and
-        audio classification to identify elephant presence and trigger an early-warning alert
-        via API notification — aimed at reducing human-elephant conflict near plantations or
-        rural roads.</p>
-        <p>[ADD 2-3 sentences: your specific role in the group, the biggest technical challenge
-        you solved, and the outcome/impact — e.g. detection accuracy, response time, or
-        field-test results.]</p>
-        <ul>
-          <li>[ADD a concrete technical detail, e.g. model type/architecture used for
-          image or audio classification]</li>
-          <li>[ADD detail on the alert pipeline / API integration]</li>
-          <li>[ADD detail on hardware setup, sensors, or power constraints]</li>
-        </ul>
-      </div>
+      <div id="elephantDescription"></div>
       <div class="project-side">
         <h5>Stack</h5>
         <div class="tag-cloud">
           <span class="tag">Raspberry Pi</span>
           <span class="tag">Python</span>
+          <span class="tag">C Programming</span>
           <span class="tag">Computer Vision</span>
           <span class="tag">Audio Classification</span>
-          <span class="tag">REST API</span>
+          <span class="tag">3D Printing</span>
+          <span class="tag">Solidworks</span>
         </div>
-        <h5>Links</h5>
+        <!-- <h5>Links</h5>
         <div class="project-links">
           <a href="[ADD GITHUB LINK]">Source Code ↗</a>
           <a href="[ADD DEMO/VIDEO LINK]">Demo Video ↗</a>
-        </div>
+        </div> -->
       </div>
     </div>
   </div>
@@ -580,6 +681,13 @@
   </div>
 </footer>
 
+<!-- Expanded image viewer for Project 01 -->
+<div class="image-lightbox" id="imageLightbox" role="dialog" aria-modal="true" aria-label="Expanded project image" aria-hidden="true">
+  <button class="lightbox-close" type="button" aria-label="Close expanded image">&times;</button>
+  <img src="" alt="">
+  <p class="lightbox-hint">Scroll to zoom · Drag to pan · Click outside or × to close</p>
+</div>
+
 <script>
   // Theme toggle (dark is default; choice is remembered for next visit)
   const root = document.documentElement;
@@ -617,6 +725,158 @@
     entries.forEach(e => { if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } });
   }, { threshold: 0.12 });
   reveals.forEach(el => io.observe(el));
+
+  // Project 01 image gallery: one numbered figure at a time, with paired
+  // source images kept together in their original proportions.
+  const elephantGallery = document.getElementById('elephantGallery');
+  if(elephantGallery){
+    const slides = [...elephantGallery.querySelectorAll('.gallery-slide')];
+    const dots = [...elephantGallery.querySelectorAll('.gallery-dot')];
+    const figure = document.getElementById('elephantFigure');
+    const description = document.getElementById('elephantDescription');
+    const count = elephantGallery.querySelector('.gallery-count');
+    let current = 0;
+
+    function showSlide(index){
+      current = (index + slides.length) % slides.length;
+      const slide = slides[current];
+      slides.forEach((item, i) => item.classList.toggle('is-active', i === current));
+      dots.forEach((dot, i) => {
+        const active = Number(dot.dataset.slide) === current;
+        dot.classList.toggle('is-active', active);
+        dot.setAttribute('aria-current', active ? 'true' : 'false');
+      });
+      figure.textContent = `FIG. ${slide.dataset.figure} — GROUP PROJECT`;
+      description.innerHTML = slide.dataset.description;
+      count.textContent = `${slide.dataset.images} / 06 images`;
+    }
+
+    // Expose the gallery update method to the expanded image viewer below.
+    elephantGallery.showSlide = showSlide;
+
+    elephantGallery.querySelector('.prev').addEventListener('click', () => showSlide(current - 1));
+    elephantGallery.querySelector('.next').addEventListener('click', () => showSlide(current + 1));
+    dots.forEach(dot => dot.addEventListener('click', () => showSlide(Number(dot.dataset.slide))));
+    showSlide(0);
+  }
+
+  // Click any Project 01 image to inspect it. Mouse wheel zooms the expanded image.
+  const imageLightbox = document.getElementById('imageLightbox');
+  if(imageLightbox && elephantGallery){
+    const lightboxImage = imageLightbox.querySelector('img');
+    const closeLightboxButton = imageLightbox.querySelector('.lightbox-close');
+    let zoom = 1;
+    let panX = 0;
+    let panY = 0;
+    let isPanning = false;
+    let pointerStartX = 0;
+    let pointerStartY = 0;
+    let panStartX = 0;
+    let panStartY = 0;
+    let lastFocusedElement;
+    const expandedImages = [...elephantGallery.querySelectorAll('.gallery-slide img')];
+    let expandedImageIndex = 0;
+
+    function applyImageTransform(){
+      lightboxImage.style.transform = `translate(${panX}px, ${panY}px) scale(${zoom})`;
+      lightboxImage.classList.toggle('is-zoomed', zoom > 1);
+    }
+
+    function closeLightbox(){
+      imageLightbox.classList.remove('is-open');
+      imageLightbox.setAttribute('aria-hidden', 'true');
+      document.body.classList.remove('lightbox-open');
+      lightboxImage.src = '';
+      zoom = 1;
+      panX = 0;
+      panY = 0;
+      lightboxImage.classList.remove('is-zoomed', 'is-panning');
+      if(lastFocusedElement){
+        const slideIndex = [...elephantGallery.querySelectorAll('.gallery-slide')].indexOf(lastFocusedElement.closest('.gallery-slide'));
+        elephantGallery.showSlide(slideIndex);
+        requestAnimationFrame(() => {
+          lastFocusedElement.scrollIntoView({ behavior:'smooth', block:'center' });
+          lastFocusedElement.focus({ preventScroll:true });
+        });
+      }
+    }
+
+    function showExpandedImage(index){
+      expandedImageIndex = (index + expandedImages.length) % expandedImages.length;
+      const sourceImage = expandedImages[expandedImageIndex];
+      lastFocusedElement = sourceImage;
+      lightboxImage.src = sourceImage.currentSrc || sourceImage.src;
+      lightboxImage.alt = sourceImage.alt;
+      zoom = 1;
+      panX = 0;
+      panY = 0;
+      applyImageTransform();
+      const slideIndex = [...elephantGallery.querySelectorAll('.gallery-slide')].indexOf(sourceImage.closest('.gallery-slide'));
+      elephantGallery.showSlide(slideIndex);
+    }
+
+    function openLightbox(sourceImage){
+      showExpandedImage(expandedImages.indexOf(sourceImage));
+      imageLightbox.classList.add('is-open');
+      imageLightbox.setAttribute('aria-hidden', 'false');
+      document.body.classList.add('lightbox-open');
+      closeLightboxButton.focus();
+    }
+
+    lightboxImage.draggable = false;
+
+    elephantGallery.querySelectorAll('.gallery-slide img').forEach(image => {
+      image.setAttribute('tabindex', '0');
+      image.setAttribute('role', 'button');
+      image.setAttribute('aria-label', `Expand: ${image.alt}`);
+      image.addEventListener('click', () => openLightbox(image));
+      image.addEventListener('keydown', event => {
+        if(event.key === 'Enter' || event.key === ' '){ event.preventDefault(); openLightbox(image); }
+      });
+    });
+
+    closeLightboxButton.addEventListener('click', closeLightbox);
+    imageLightbox.addEventListener('click', event => { if(event.target === imageLightbox) closeLightbox(); });
+    imageLightbox.addEventListener('wheel', event => {
+      event.preventDefault();
+      zoom = Math.min(3, Math.max(1, zoom + (event.deltaY < 0 ? 0.15 : -0.15)));
+      if(zoom === 1){ panX = 0; panY = 0; }
+      applyImageTransform();
+    }, { passive:false });
+    lightboxImage.addEventListener('pointerdown', event => {
+      if(zoom <= 1 || event.button !== 0) return;
+      event.preventDefault();
+      isPanning = true;
+      pointerStartX = event.clientX;
+      pointerStartY = event.clientY;
+      panStartX = panX;
+      panStartY = panY;
+      lightboxImage.setPointerCapture(event.pointerId);
+      lightboxImage.classList.add('is-panning');
+    });
+    lightboxImage.addEventListener('pointermove', event => {
+      if(!isPanning) return;
+      panX = panStartX + event.clientX - pointerStartX;
+      panY = panStartY + event.clientY - pointerStartY;
+      applyImageTransform();
+    });
+    function stopPanning(event){
+      if(!isPanning) return;
+      isPanning = false;
+      lightboxImage.classList.remove('is-panning');
+      if(event && lightboxImage.hasPointerCapture(event.pointerId)) lightboxImage.releasePointerCapture(event.pointerId);
+    }
+    lightboxImage.addEventListener('pointerup', stopPanning);
+    lightboxImage.addEventListener('pointercancel', stopPanning);
+    lightboxImage.addEventListener('dragstart', event => event.preventDefault());
+    imageLightbox.addEventListener('contextmenu', event => event.preventDefault());
+    document.addEventListener('keydown', event => {
+      if(!imageLightbox.classList.contains('is-open')) return;
+      if(event.key === 'Escape') closeLightbox();
+      if(event.key === 'ArrowLeft'){ event.preventDefault(); showExpandedImage(expandedImageIndex - 1); }
+      if(event.key === 'ArrowRight'){ event.preventDefault(); showExpandedImage(expandedImageIndex + 1); }
+    });
+  }
 </script>
 
 </body>
