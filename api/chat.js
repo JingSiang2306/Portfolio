@@ -10,7 +10,7 @@
 //      on your hosting platform (never commit it into this file or index.html)
 //   3. Deploy this whole /site folder (index.html + /api) as-is
 
-const KNOWLEDGE_BASE = require('./knowledge.js');
+const KNOWLEDGE_BASE = require('./knowledge_2.js');
 
 const SYSTEM_PROMPT = `You are the AI assistant embedded on Cheng Jing Siang's engineering portfolio website.
 
