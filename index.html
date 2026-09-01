@@ -564,43 +564,44 @@
     <span class="b-tr"></span><span class="b-bl"></span>
     <div class="project-top">
       <div>
-        <span class="project-fig">FIG. 02 — FINAL YEAR PROJECT</span>
+        <span class="project-fig" id="leakFigure">FIG. 01 — FINAL YEAR PROJECT</span>
         <h3>Edge AI Low-Power Water Leak Detection</h3>
       </div>
-      <span class="project-status">[ADD STATUS, e.g. Completed]</span>
+      <span class="project-status">Completed</span>
     </div>
 
-    <div class="project-media">
-      [ADD PHOTO / CAD RENDER / PCB PHOTO / DEMO OF THE LEAK DETECTOR HERE]
+    <div class="project-gallery" id="leakGallery" aria-label="Project 02 image gallery">
+      <div class="project-media">
+        <div class="gallery-slide is-active" data-figure="01" data-images="01" data-description="<p>A simple map of the complete leak-detection system. It listens for pipe sound and vibration, checks the signals on the device, and sends a wireless alert when a leak is found.</p>"><img src="Image/Y4FYP/1_SystemDiagram.png" alt="Overview of the Edge AI water leak detection system"></div>
+        <div class="gallery-slide" data-figure="02" data-images="02" data-description="<p>The working prototype combines a compact STM32 board, built-in microphone and motion sensor, LoRa radio, and power hardware. These parts let it monitor a pipe without relying on a nearby computer.</p>"><img src="Image/Y4FYP/2_Components.png" alt="Components used in the water leak detection prototype"></div>
+        <div class="gallery-slide" data-figure="03" data-images="03" data-description="<p>A controlled pipe rig was built to create repeatable leak and no-leak conditions. This provided a safe way to collect realistic sensor signals and test the system.</p>"><img src="Image/Y4FYP/3_SimulationRig.png" alt="Laboratory pipe rig used to simulate water leaks"></div>
+        <div class="gallery-slide" data-figure="04" data-images="04" data-description="<p>A data logger recorded sound and vibration from the pipe. The recordings gave the AI examples of normal operation and leaks to learn from.</p>"><img src="Image/Y4FYP/4_DataLogger.png" alt="Data logger used to capture pipe sound and vibration"></div>
+        <div class="gallery-slide is-pair" data-figure="05" data-images="05" data-description="<p>Recorded sensor signals were prepared for training, then used to create a lightweight detection algorithm. The final model was tailored to run directly on the small embedded device.</p>"><img src="Image/Y4FYP/5_CollectedData.png" alt="Collected sensor data for leak detection"><img src="Image/Y4FYP/5_OptimizedAlgorithm.png" alt="Optimised embedded AI algorithm"></div>
+        <div class="gallery-slide" data-figure="06" data-images="06" data-description="<p>The device combines the conclusions from sound and vibration rather than trusting only one signal. This makes the final leak decision more dependable when conditions are noisy.</p>"><img src="Image/Y4FYP/6_SensorFusion.png" alt="Sound and vibration sensor fusion process"></div>
+        <div class="gallery-slide" data-figure="07" data-images="07" data-description="<p>Short readings are checked repeatedly over a 30-second cycle before the system decides whether there is a leak. This reduces false alarms caused by brief disturbances.</p>"><img src="Image/Y4FYP/7_DecisionFlow.png" alt="Water leak detection decision flow"></div>
+        <div class="gallery-slide" data-figure="08" data-images="08" data-description="<p>During controlled testing, the best setup correctly identified leaks 88% of the time. It detected every tested leak, showing strong potential for early warning.</p>"><img src="Image/Y4FYP/8_Accuracy.png" alt="Accuracy results for the embedded leak detection system"></div>
+        <div class="gallery-slide is-pair" data-figure="09" data-images="09" data-description="<p>The embedded model was compared with YAMNet, a larger audio-recognition model. The lightweight NanoEdge AI approach was the better practical fit for this small, low-power device.</p>"><img src="Image/Y4FYP/9_YAMNetAccuracy.png" alt="YAMNet model accuracy comparison"><img src="Image/Y4FYP/9_YAMNet-NEAI.png" alt="YAMNet and NanoEdge AI deployment comparison"></div>
+      </div>
+      <button class="gallery-arrow prev" type="button" aria-label="Previous Project 02 image">&#8249;</button>
+      <button class="gallery-arrow next" type="button" aria-label="Next Project 02 image">&#8250;</button>
+      <div class="gallery-pagination" aria-label="Choose Project 02 image">
+        <button class="gallery-dot is-active" data-slide="0" type="button" aria-label="Show image 1" aria-current="true"></button><button class="gallery-dot" data-slide="1" type="button" aria-label="Show image 2"></button><button class="gallery-dot" data-slide="2" type="button" aria-label="Show image 3"></button><button class="gallery-dot" data-slide="3" type="button" aria-label="Show image 4"></button><button class="gallery-dot" data-slide="4" type="button" aria-label="Show images 5"></button><button class="gallery-dot" data-slide="5" type="button" aria-label="Show image 6"></button><button class="gallery-dot" data-slide="6" type="button" aria-label="Show image 7"></button><button class="gallery-dot" data-slide="7" type="button" aria-label="Show image 8"></button><button class="gallery-dot" data-slide="8" type="button" aria-label="Show images 9"></button>
+        <span class="gallery-count">01 / 09</span>
+      </div>
     </div>
 
     <div class="project-body">
-      <div>
-        <p>An STM32U5-based Edge AI system for detecting water leaks using acoustic-vibration
-        sensor fusion, with LoRa communication for long-range, low-power alerting — designed
-        for deployment in locations without constant power or network access.</p>
-        <p>[ADD 2-3 sentences: what made this "edge AI" and "low-power" specifically —
-        e.g. on-device inference, power budget/battery life achieved, sensor fusion approach,
-        and any test results or accuracy numbers.]</p>
-        <ul>
-          <li>[ADD detail on the ML model used and how it runs on-device]</li>
-          <li>[ADD detail on sensor fusion — which sensors, how combined]</li>
-          <li>[ADD detail on LoRa range/power results from testing]</li>
-        </ul>
-      </div>
+      <div id="leakDescription"></div>
       <div class="project-side">
         <h5>Stack</h5>
         <div class="tag-cloud">
           <span class="tag">STM32U5</span>
+          <span class="tag">Python</span>
           <span class="tag">Edge AI</span>
           <span class="tag">LoRa</span>
+          <span class="tag">NanoEdge AI Studio</span>
           <span class="tag">Sensor Fusion</span>
-          <span class="tag">C</span>
-        </div>
-        <h5>Links</h5>
-        <div class="project-links">
-          <a href="[ADD GITHUB LINK]">Source Code ↗</a>
-          <a href="[ADD REPORT/PAPER LINK]">Full Report ↗</a>
+          <span class="tag">C Programming</span>
         </div>
       </div>
     </div>
@@ -873,6 +874,148 @@
       if(event.key === 'Escape') closeLightbox();
       if(event.key === 'ArrowLeft'){ event.preventDefault(); showExpandedImage(expandedImageIndex - 1); }
       if(event.key === 'ArrowRight'){ event.preventDefault(); showExpandedImage(expandedImageIndex + 1); }
+    });
+  }
+</script>
+
+<!-- Project 02 uses the same expandable, zoomable gallery interaction as Project 01. -->
+<div class="image-lightbox" id="leakLightbox" role="dialog" aria-modal="true" aria-label="Expanded Project 02 image" aria-hidden="true">
+  <button class="lightbox-close" type="button" aria-label="Close expanded image">&times;</button>
+  <img src="" alt="">
+  <p class="lightbox-hint">Scroll to zoom · Drag to pan · Click outside or × to close</p>
+</div>
+
+<script>
+  const leakGallery = document.getElementById('leakGallery');
+  const leakFigure = document.getElementById('leakFigure');
+  const leakDescription = document.getElementById('leakDescription');
+
+  if(leakGallery){
+    const slides = [...leakGallery.querySelectorAll('.gallery-slide')];
+    const dots = [...leakGallery.querySelectorAll('.gallery-dot')];
+    const count = leakGallery.querySelector('.gallery-count');
+    let current = 0;
+
+    function showSlide(index){
+      current = (index + slides.length) % slides.length;
+      const slide = slides[current];
+      slides.forEach((item, itemIndex) => item.classList.toggle('is-active', itemIndex === current));
+      dots.forEach((dot, dotIndex) => {
+        const active = dotIndex === current;
+        dot.classList.toggle('is-active', active);
+        dot.setAttribute('aria-current', active ? 'true' : 'false');
+      });
+      leakFigure.textContent = `FIG. ${slide.dataset.figure} - FINAL YEAR PROJECT`;
+      leakDescription.innerHTML = slide.dataset.description;
+      count.textContent = `${slide.dataset.images} / 09`;
+    }
+
+    leakGallery.showSlide = showSlide;
+    leakGallery.querySelector('.prev').addEventListener('click', () => showSlide(current - 1));
+    leakGallery.querySelector('.next').addEventListener('click', () => showSlide(current + 1));
+    dots.forEach(dot => dot.addEventListener('click', () => showSlide(Number(dot.dataset.slide))));
+    showSlide(0);
+
+    const leakLightbox = document.getElementById('leakLightbox');
+    const lightboxImage = leakLightbox.querySelector('img');
+    const closeButton = leakLightbox.querySelector('.lightbox-close');
+    const galleryImages = [...leakGallery.querySelectorAll('.gallery-slide img')];
+    let expandedIndex = 0;
+    let zoom = 1;
+    let panX = 0;
+    let panY = 0;
+    let panning = false;
+    let startX = 0;
+    let startY = 0;
+    let startPanX = 0;
+    let startPanY = 0;
+    let triggerImage;
+
+    function applyTransform(){
+      lightboxImage.style.transform = `translate(${panX}px, ${panY}px) scale(${zoom})`;
+      lightboxImage.classList.toggle('is-zoomed', zoom > 1);
+    }
+
+    function showExpanded(index){
+      expandedIndex = (index + galleryImages.length) % galleryImages.length;
+      const image = galleryImages[expandedIndex];
+      triggerImage = image;
+      lightboxImage.src = image.currentSrc || image.src;
+      lightboxImage.alt = image.alt;
+      zoom = 1;
+      panX = 0;
+      panY = 0;
+      applyTransform();
+      leakGallery.showSlide(slides.indexOf(image.closest('.gallery-slide')));
+    }
+
+    function closeLightbox(){
+      leakLightbox.classList.remove('is-open');
+      leakLightbox.setAttribute('aria-hidden', 'true');
+      document.body.classList.remove('lightbox-open');
+      lightboxImage.src = '';
+      if(triggerImage){
+        triggerImage.focus({ preventScroll:true });
+      }
+    }
+
+    function openLightbox(image){
+      showExpanded(galleryImages.indexOf(image));
+      leakLightbox.classList.add('is-open');
+      leakLightbox.setAttribute('aria-hidden', 'false');
+      document.body.classList.add('lightbox-open');
+      closeButton.focus();
+    }
+
+    galleryImages.forEach(image => {
+      image.setAttribute('tabindex', '0');
+      image.setAttribute('role', 'button');
+      image.setAttribute('aria-label', `Expand: ${image.alt}`);
+      image.addEventListener('click', () => openLightbox(image));
+      image.addEventListener('keydown', event => {
+        if(event.key === 'Enter' || event.key === ' '){ event.preventDefault(); openLightbox(image); }
+      });
+    });
+
+    lightboxImage.draggable = false;
+    closeButton.addEventListener('click', closeLightbox);
+    leakLightbox.addEventListener('click', event => { if(event.target === leakLightbox) closeLightbox(); });
+    leakLightbox.addEventListener('wheel', event => {
+      event.preventDefault();
+      zoom = Math.min(3, Math.max(1, zoom + (event.deltaY < 0 ? 0.15 : -0.15)));
+      if(zoom === 1){ panX = 0; panY = 0; }
+      applyTransform();
+    }, { passive:false });
+    lightboxImage.addEventListener('pointerdown', event => {
+      if(zoom <= 1 || event.button !== 0) return;
+      event.preventDefault();
+      panning = true;
+      startX = event.clientX;
+      startY = event.clientY;
+      startPanX = panX;
+      startPanY = panY;
+      lightboxImage.setPointerCapture(event.pointerId);
+      lightboxImage.classList.add('is-panning');
+    });
+    lightboxImage.addEventListener('pointermove', event => {
+      if(!panning) return;
+      panX = startPanX + event.clientX - startX;
+      panY = startPanY + event.clientY - startY;
+      applyTransform();
+    });
+    function stopPanning(event){
+      if(!panning) return;
+      panning = false;
+      lightboxImage.classList.remove('is-panning');
+      if(lightboxImage.hasPointerCapture(event.pointerId)) lightboxImage.releasePointerCapture(event.pointerId);
+    }
+    lightboxImage.addEventListener('pointerup', stopPanning);
+    lightboxImage.addEventListener('pointercancel', stopPanning);
+    document.addEventListener('keydown', event => {
+      if(!leakLightbox.classList.contains('is-open')) return;
+      if(event.key === 'Escape') closeLightbox();
+      if(event.key === 'ArrowLeft'){ event.preventDefault(); showExpanded(expandedIndex - 1); }
+      if(event.key === 'ArrowRight'){ event.preventDefault(); showExpanded(expandedIndex + 1); }
     });
   }
 </script>
