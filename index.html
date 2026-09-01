@@ -492,7 +492,7 @@
           <img src="Image/Y3GP/2_MechanicalDesign.png" 
           alt="Mechanical design of the elephant detection device">
         </div>
-        <div class="gallery-slide is-pair" data-figure="03" data-images="03–04" data-description=
+        <div class="gallery-slide is-pair" data-figure="03" data-images="03" data-description=
           "<p>The computer-vision pipeline was developed with YOLO to identify elephants from camera 
             images at the edge.</p>
           <p>I annotated the training data, trained and tested the detection model, then deployed it 
@@ -509,7 +509,7 @@
           <img src="Image/Y3GP/3_MechanicalPlot.jpg" 
           alt="Mechanical design analysis plot">
         </div>
-        <div class="gallery-slide is-pair" data-figure="04" data-images="05–06" data-description=
+        <div class="gallery-slide is-pair" data-figure="04" data-images="04" data-description=
           "<p>The Raspberry Pi 5 coordinates the complete early-warning workflow, combining image and 
             acoustic results before deciding whether to raise an alert.
           </p>
@@ -532,10 +532,8 @@
         <button class="gallery-dot is-active" data-slide="0" type="button" aria-label="Show image 1" aria-current="true"></button>
         <button class="gallery-dot" data-slide="1" type="button" aria-label="Show image 2"></button>
         <button class="gallery-dot" data-slide="2" type="button" aria-label="Show images 3 and 4"></button>
-        <button class="gallery-dot" data-slide="2" type="button" aria-label="Show images 3 and 4"></button>
         <button class="gallery-dot" data-slide="3" type="button" aria-label="Show images 5 and 6"></button>
-        <button class="gallery-dot" data-slide="3" type="button" aria-label="Show images 5 and 6"></button>
-        <span class="gallery-count">01 / 06 images</span>
+        <span class="gallery-count">01 / 04 </span>
       </div>
     </div>
 
@@ -748,7 +746,7 @@
       });
       figure.textContent = `FIG. ${slide.dataset.figure} — GROUP PROJECT`;
       description.innerHTML = slide.dataset.description;
-      count.textContent = `${slide.dataset.images} / 06 images`;
+      count.textContent = `${slide.dataset.images} / 04`;
     }
 
     // Expose the gallery update method to the expanded image viewer below.
