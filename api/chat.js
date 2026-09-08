@@ -1,14 +1,10 @@
 // Serverless function for the portfolio's AI chatbot.
-// Deploy this on a platform that supports serverless/edge functions
-// (Vercel, Netlify Functions, Cloudflare Pages Functions, etc).
-// It calls the real Anthropic API server-side, so your API key is
-// never exposed to visitors' browsers.
+// Calls OpenAI server-side so the API key stays private.
 //
 // Required setup:
-//   1. Get an API key from https://console.anthropic.com
-//   2. Set it as an environment variable named ANTHROPIC_API_KEY
-//      on your hosting platform (never commit it into this file or index.html)
-//   3. Deploy this whole /site folder (index.html + /api) as-is
+//   1. Set OPENAI_API_KEY in your hosting platform's environment variables.
+//   2. Keep knowledge_v2.0.js in the same folder as this file.
+//   3. Deploy the whole /site folder (index.html + /api).
 
 const KNOWLEDGE_BASE = require('./knowledge_v2.0.js');
 
@@ -38,61 +34,86 @@ module.exports = async function handler(req, res) {
     return;
   }
 
-  const apiKey = process.env.ANTHROPIC_API_KEY;
+  const apiKey = process.env.OPENAI_API_KEY;
+
   if (!apiKey) {
-    res.status(500).json({ error: 'Server is missing ANTHROPIC_API_KEY. Set it in your hosting platform\'s environment variables.' });
+    res.status(500).json({
+      error: 'Server is missing OPENAI_API_KEY. Set it in your hosting platform\'s environment variables.'
+    });
     return;
   }
 
   try {
     const { message, history } = req.body || {};
+
     if (!message || typeof message !== 'string') {
-      res.status(400).json({ error: 'Missing "message" in request body.' });
+      res.status(400).json({
+        error: 'Missing "message" in request body.'
+      });
       return;
     }
 
-    // Keep only the last few turns to control cost/latency — the knowledge
-    // base itself is re-sent every time via the system prompt, so full
-    // history isn't needed for the bot to stay grounded.
-    const trimmedHistory = Array.isArray(history) ? history.slice(-6) : [];
+    // Keep the last six messages to control cost and response time.
+    // The knowledge base is included in every request.
+    const trimmedHistory = Array.isArray(history)
+      ? history.slice(-6)
+      : [];
 
     const messages = [
-      ...trimmedHistory.filter(m => m && (m.role === 'user' || m.role === 'assistant') && typeof m.content === 'string'),
+      ...trimmedHistory.filter(
+        m =>
+          m &&
+          (m.role === 'user' || m.role === 'assistant') &&
+          typeof m.content === 'string'
+      ),
       { role: 'user', content: message }
     ];
 
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
+    const response = await fetch('https://api.openai.com/v1/responses', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-api-key': apiKey,
-        'anthropic-version': '2023-06-01'
+        'Authorization': `Bearer ${apiKey}`
       },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-6',
-        max_tokens: 400,
-        system: SYSTEM_PROMPT,
-        messages
+        model: 'gpt-5-nano',
+        max_output_tokens: 400,
+        instructions: SYSTEM_PROMPT,
+        input: messages
       })
     });
 
     if (!response.ok) {
       const errText = await response.text();
-      console.error('Anthropic API error:', response.status, errText);
-      res.status(502).json({ error: 'The AI assistant is temporarily unavailable. Please try again shortly.' });
+      console.error('OpenAI API error:', response.status, errText);
+
+      res.status(502).json({
+        error: 'The AI assistant is temporarily unavailable. Please try again shortly.'
+      });
       return;
     }
 
     const data = await response.json();
-    const reply = (data.content || [])
-      .filter(block => block.type === 'text')
-      .map(block => block.text)
+
+    // Extract the assistant's text from the OpenAI response.
+    const reply = (data.output || [])
+      .filter(item => item.type === 'message')
+      .flatMap(item => item.content || [])
+      .filter(block => block.type === 'output_text')
+      .map(block => block.text || '')
       .join('\n')
       .trim();
 
-    res.status(200).json({ reply: reply || "Hmm, I drew a blank on that one — try rephrasing, or reach out to Jing Siang directly." });
+    res.status(200).json({
+      reply:
+        reply ||
+        "Hmm, I drew a blank on that one — try rephrasing, or reach out to Jing Siang directly."
+    });
   } catch (err) {
     console.error('Chat function error:', err);
-    res.status(500).json({ error: 'Something went wrong on the server side. Please try again.' });
+
+    res.status(500).json({
+      error: 'Something went wrong on the server side. Please try again.'
+    });
   }
 };
