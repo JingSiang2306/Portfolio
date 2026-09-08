@@ -533,45 +533,57 @@
             via API notification — aimed at reducing human-elephant conflict near plantations or 
             rural roads.
           </p>
-          <p>I led the mechanical design from 3D modelling and 3D printing through to a compact 
-            internal layout. The enclosure was designed for ventilation, waterproofing, modular 
-            assembly, and straightforward maintenance in outdoor deployment.
+          <p>My role covered both the physical and software implementation of the device. 
+            In addition to leading the mechanical design, I trained and deployed the image-detection 
+            AI model on the Raspberry Pi 5 and developed the main program that coordinates the device's 
+            detection and operating workflow.
           </p>
           <ul>
-            <li>Optimised internal electronics for space efficiency and service access</li>
-            <li>Designed airflow and fan integration to manage heat within the enclosure</li>
-            <li>Built a modular, weather-resistant housing for field-ready operation</li>
+            <li>Trained and deployed the image-detection model for elephant recognition</li>
+            <li>Implemented the overall detection and control flow on Raspberry Pi 5</li>
+            <li>Led the enclosure and internal mechanical design</li>
+            <li>Integrated the AI model, camera, audio system, and supporting hardware into a working prototype</li>
           </ul>">
           <img src="Image/Y3GP/1_ImageDetection.jpg" 
           alt="Elephant image-detection system">
         </div>
         <div class="gallery-slide" data-figure="02" data-images="02" data-description=
-          "<p>The mechanical design process translated the system requirements into a compact, 
-            manufacturable enclosure for the Raspberry Pi-based device.
+          "<p>The enclosure was designed in SolidWorks to package the Raspberry Pi, cameras, microphone, 
+            power electronics, and supporting hardware into a compact and practical field device. I organised 
+            the internal layout while considering size, weight, manufacturability, maintenance access, 
+            weather protection, and thermal management.
           </p>
-          <p>I developed and iterated the 3D model, using 3D-printed parts to validate component placement, 
-            cable routing, ventilation, weather protection, and access for maintenance. The 
-            final layout balanced thermal performance, waterproofing, and modular replacement.
+          <p>I designed the metal enclosure together with custom 3D-printed holders and mounting components to 
+            secure the electronics and simplify assembly. The manufactured prototype shown alongside the CAD 
+            model demonstrates that the design was successfully translated from concept into a functional 
+            physical system suitable for outdoor deployment.
           </p>
           <ul>
-            <li>Created a space-efficient internal component layout</li>
-            <li>Designed for rapid prototyping and iterative 3D-print validation</li>
-            <li>Integrated ventilation and sealing considerations into the enclosure</li>
+            <li>Designed the enclosure and internal component layout in SolidWorks</li>
+            <li>Balanced compactness, weight, manufacturability, and maintenance access</li>
+            <li>Incorporated waterproofing, ventilation, and thermal-dissipation considerations</li>
+            <li>Designed and 3D-printed custom holders for component mounting</li>
+            <li>Translated the CAD design into an assembled and functioning prototype</li>
           </ul>">
           <img src="Image/Y3GP/2_MechanicalDesign.png" 
           alt="Mechanical design of the elephant detection device">
         </div>
         <div class="gallery-slide is-pair" data-figure="03" data-images="03" data-description=
-          "<p>The computer-vision pipeline was developed with YOLO to identify elephants from camera 
-            images at the edge.</p>
-          <p>I annotated the training data, trained and tested the detection model, then deployed it 
-            on a Raspberry Pi 5 for on-device inference. Accuracy testing and mechanical design analysis 
-            helped validate both the model performance and the physical implementation.
+          "<p>The AI model was trained and evaluated to confirm that it could reliably recognise elephants 
+            before being deployed to the Raspberry Pi 5. The training results showed the model reaching a 
+            stable accuracy in the mid-90% range, providing confidence that the detection approach was 
+            suitable for the prototype.
+          </p>
+          <p>The enclosure was also evaluated using static structural simulations across several sheet-metal 
+            thicknesses. I compared stress, displacement, factor of safety, and mass to select a suitable 
+            material thickness while balancing structural strength against the need to keep the device lightweight.
           </p>
           <ul>
-            <li>Annotated, trained, tested, and deployed a YOLO image-detection model</li>
-            <li>Implemented inference on Raspberry Pi 5 for edge operation</li>
-            <li>Evaluated model accuracy alongside the mechanical design</li>
+            <li>Evaluated the trained AI model before deployment to the Raspberry Pi 5</li>
+            <li>Achieved stable model accuracy in the mid-90% range during training</li>
+            <li>Simulated enclosure stress, displacement, factor of safety, and mass</li>
+            <li>Compared multiple metal thicknesses to support the final design decision</li>
+            <li>Balanced mechanical strength and safety against overall enclosure weight</li>
           </ul>">
           <img src="Image/Y3GP/3_Accuracy.jpg" 
           alt="YOLO image-detection accuracy results">
@@ -579,17 +591,24 @@
           alt="Mechanical design analysis plot">
         </div>
         <div class="gallery-slide is-pair" data-figure="04" data-images="04" data-description=
-          "<p>The Raspberry Pi 5 coordinates the complete early-warning workflow, combining image and 
-            acoustic results before deciding whether to raise an alert.
+          "<p>When an elephant is detected, the Raspberry Pi packages the detection information 
+            and communicates with the project's API. The payload includes information such as the 
+            device name, timestamp, detection result, confidence level, and associated image or 
+            audio files, allowing each event to be stored in the database and displayed through 
+            the monitoring website.
           </p>
-          <p>I implemented the system control flow, alert payload generation, and API integration, 
-            while considering power-saving behaviour for solar-powered operation. Detection events 
-            are logged and sent as actionable Telegram notifications for timely response.
+          <p>My responsibility was the device-side integration rather than development of the API 
+            or website. I implemented the communication flow required to connect with the API, 
+            send detection events, and report the device's current status so the system could verify 
+            that it remained online. Confirmed detection events could then trigger Telegram alerts for 
+            subscribed users.
           </p>
           <ul>
-            <li>Combined image and acoustic classification results in the decision flow</li>
-            <li>Sent alert payloads through an API and recorded detection events</li>
-            <li>Applied power optimisation for solar-powered deployment</li>
+            <li>Integrated the Raspberry Pi with the given API</li>
+            <li>Generated and transmitted detection payloads with event data and media</li>
+            <li>Implemented device-status reporting to support online/offline monitoring</li>
+            <li>Connected detection results to the wider logging and warning workflow</li>
+            <li>Supported automatic Telegram alerts following confirmed detections</li>
           </ul>">
           <img src="Image/Y3GP/4_DetectionLog.jpg" alt="Elephant detection event log">
           <img src="Image/Y3GP/4_TelegramAlert.jpg" alt="Telegram early-warning alert">
@@ -1182,7 +1201,7 @@
       typingBubble.remove();
 
       if(!response.ok || !data.reply){
-        addChatMessage(data.error || "I couldn't reach the AI backend just now. Please try again in a moment, or contact Cheng directly.", 'bot');
+        addChatMessage(data.error || "I couldn't reach the AI backend just now. Please try again in a moment, or contact Jing Siang directly.", 'bot');
         return;
       }
 
@@ -1191,7 +1210,7 @@
       conversationHistory.push({ role: 'assistant', content: data.reply });
     } catch (err) {
       typingBubble.remove();
-      addChatMessage("I'm having trouble connecting right now. Please try again shortly, or reach Cheng directly via the contact section.", 'bot');
+      addChatMessage("I'm having trouble connecting right now. Please try again shortly, or reach Jing Siang directly via the contact section.", 'bot');
     } finally {
       setWaiting(false);
     }
