@@ -3,10 +3,10 @@
 //
 // Required setup:
 //   1. Set OPENAI_API_KEY in your hosting platform's environment variables.
-//   2. Keep knowledge_v2.0.js in the same folder as this file.
+//   2. Keep knowledge_v2.1.js in the same folder as this file.
 //   3. Deploy the whole /site folder (index.html + /api).
 
-const KNOWLEDGE_BASE = require('./knowledge_v2.0.js');
+const KNOWLEDGE_BASE = require('./knowledge_v2.1.js');
 
 const SYSTEM_PROMPT = `You are the AI assistant embedded on Cheng Jing Siang's engineering portfolio website.
 
