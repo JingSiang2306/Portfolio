@@ -77,7 +77,9 @@ module.exports = async function handler(req, res) {
       },
       body: JSON.stringify({
         model: 'gpt-5-nano',
-        max_output_tokens: 400,
+        reasoning: { effort: 'minimal' },
+        text: { verbosity: 'low' },
+        max_output_tokens: 2000,
         instructions: SYSTEM_PROMPT,
         input: messages
       })
@@ -104,11 +106,25 @@ module.exports = async function handler(req, res) {
       .join('\n')
       .trim();
 
-    res.status(200).json({
-      reply:
-        reply ||
-        "Hmm, I drew a blank on that one — try rephrasing, or reach out to Jing Siang directly."
-    });
+    // Log failed or empty generations instead of treating them as answers.
+    if (data.status !== 'completed' || !reply) {
+      console.error('OpenAI response incomplete or empty:', {
+        response_id: data.id,
+        status: data.status,
+        incomplete_details: data.incomplete_details,
+        error_code: data.error?.code,
+        usage: data.usage,
+        output_types: (data.output || []).map(item => item.type)
+      });
+
+      res.status(502).json({
+        error: 'The AI assistant could not finish its response. Please try again.'
+      });
+      return;
+    }
+
+    res.status(200).json({ reply });
+
   } catch (err) {
     console.error('Chat function error:', err);
 
