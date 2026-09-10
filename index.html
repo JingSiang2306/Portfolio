@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Cheng Jing Siang — Mechatronic Engineer</title>
+<meta name="description" content="Cheng Jing Siang’s engineering portfolio: embedded AI, water leak detection, elephant early warning, mechanical design and automation.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -36,9 +37,9 @@
     --line-blue-soft: #DCE6EF;
     --paper:       #10253B;   /* primary text */
     --paper-dim:   #52697E;   /* secondary text */
-    --copper:      #D9631F;   /* primary accent — darker for AA contrast on white */
+    --copper:      #B54B10;   /* primary accent — darker for AA contrast on white */
     --copper-dim:  #F0C6A6;
-    --teal:        #0C8C7D;   /* secondary accent — darker for contrast on white */
+    --teal:        #096E62;   /* secondary accent — darker for contrast on white */
   }
   html[data-theme="light"] .hero,
   html[data-theme="light"] .grid-bg{
@@ -46,7 +47,11 @@
       linear-gradient(var(--line-blue-soft) 1px, transparent 1px),
       linear-gradient(90deg, var(--line-blue-soft) 1px, transparent 1px);
   }
-  html[data-theme="light"] .btn-primary{ color:#FFFFFF; }
+  html[data-theme="light"] .btn-primary,
+  html[data-theme="light"] .chat-launcher,
+  html[data-theme="light"] .chat-send,
+  html[data-theme="light"] .chat-stop,
+  html[data-theme="light"] .user .chat-content{ color:#FFFFFF; }
   html[data-theme="light"] header{ background:rgba(250,251,253,0.88); }
   html[data-theme="light"] .project-media{ color:var(--paper-dim); }
 
@@ -146,8 +151,8 @@
   @media (max-width:780px){
     .navlinks{ position:fixed; top:68px; left:0; right:0; background:var(--navy-panel);
       flex-direction:column; padding:20px 32px; gap:18px; border-bottom:1px solid var(--line-blue-soft);
-      transform:translateY(-140%); transition:transform .25s ease; }
-    .navlinks.open{ transform:translateY(0); }
+      visibility:hidden; transform:translateY(-140%); transition:transform .25s ease, visibility .25s; }
+    .navlinks.open{ visibility:visible; transform:translateY(0); }
     .nav-toggle{ display:block; }
   }
 
@@ -343,76 +348,102 @@
   }
 
   /* ---------- AI CHAT WIDGET ---------- */
+  [hidden]{ display:none !important; }
+  :focus-visible{ outline:2px solid var(--teal); outline-offset:3px; }
+  .skip-link{ position:fixed; left:16px; top:-80px; z-index:500; padding:12px 18px; background:var(--navy-panel); color:var(--paper); }
+  .skip-link:focus{ top:12px; }
+  section[id], footer[id]{ scroll-margin-top:92px; }
   .chat-launcher{
-    position:fixed; right:26px; bottom:26px; z-index:200;
-    width:56px; height:56px; border-radius:50%;
-    background:var(--copper); color:#12100D; border:none;
-    font-size:22px; cursor:pointer;
-    box-shadow:0 8px 24px rgba(0,0,0,.35);
-    transition:transform .2s ease, background .2s ease;
+    position:fixed; right:24px; bottom:max(24px, env(safe-area-inset-bottom)); z-index:200;
+    min-height:52px; padding:0 20px; border-radius:26px; border:1px solid var(--copper);
+    background:var(--copper); color:#12100D; font:600 14px 'Inter',sans-serif; cursor:pointer;
+    box-shadow:0 8px 24px rgba(0,0,0,.25);
   }
-  .chat-launcher:hover{ transform:scale(1.06) rotate(-8deg); background:#ffa066; }
-
+  .chat-launcher:hover{ background:#ffa066; }
   .chat-panel{
-    position:fixed; right:26px; bottom:96px; z-index:200;
-    width:360px; max-width:calc(100vw - 40px);
-    height:min(560px, 70vh);
-    background:var(--navy-panel);
-    border:1px solid var(--line-blue-soft);
-    box-shadow:0 20px 60px rgba(0,0,0,.45);
-    display:flex; flex-direction:column;
-    transform:translateY(16px) scale(.97); opacity:0; pointer-events:none;
-    transition:transform .2s ease, opacity .2s ease;
+    position:fixed; right:24px; bottom:88px; z-index:210; width:420px;
+    max-width:calc(100vw - 32px); height:min(650px, calc(100vh - 112px));
+    height:min(650px, calc(100dvh - 112px));
+    background:var(--navy-panel); color:var(--paper); border:1px solid var(--line-blue);
+    border-radius:8px; box-shadow:0 20px 60px rgba(0,0,0,.4);
+    display:flex; flex-direction:column; overflow:hidden;
   }
-  .chat-panel.is-open{ transform:translateY(0) scale(1); opacity:1; pointer-events:auto; }
-
-  .chat-head{
-    display:flex; justify-content:space-between; align-items:flex-start;
-    padding:20px 18px 14px; border-bottom:1px solid var(--line-blue-soft);
-  }
-  .chat-eyebrow{ font-family:'JetBrains Mono', monospace; font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--teal); margin:0 0 4px; }
-  .chat-head h2{ font-size:16px; color:var(--paper); }
-  .chat-close{ background:none; border:none; color:var(--paper-dim); font-size:20px; cursor:pointer; line-height:1; padding:2px 4px; }
-  .chat-close:hover{ color:var(--copper); }
-
-  .chat-messages{ flex:1; overflow-y:auto; padding:16px 18px; display:flex; flex-direction:column; gap:12px; }
-  .chat-message{ max-width:86%; }
-  .chat-message p { margin: 0; padding: 10px 13px; font-size: 14px; line-height: 1.5; border-radius: var(--radius); white-space: pre-wrap; overflow-wrap: anywhere; }
+  .chat-head{ display:flex; gap:8px; justify-content:space-between; align-items:flex-start; padding:16px; border-bottom:1px solid var(--line-blue-soft); flex-shrink:0; }
+  .chat-eyebrow{ font:12px 'JetBrains Mono',monospace; letter-spacing:.08em; text-transform:uppercase; color:var(--teal); margin:0 0 5px; }
+  .chat-head h2{ font-size:17px; line-height:1.35; }
+  .chat-head-actions{ display:flex; flex-shrink:0; gap:4px; }
+  .chat-close,.chat-reset{ min-height:40px; border:0; border-radius:4px; background:transparent; color:var(--paper-dim); cursor:pointer; }
+  .chat-reset{ font:13px 'Inter',sans-serif; padding:0 8px; }
+  .chat-close{ width:40px; font-size:24px; }
+  .chat-close:hover,.chat-reset:hover{ background:var(--navy-panel-2); color:var(--paper); }
+  .chat-messages{ flex:1; min-height:0; overflow-y:auto; overscroll-behavior:contain; padding:16px; display:flex; flex-direction:column; gap:14px; }
+  .chat-message{ max-width:94%; flex-shrink:0; overflow-wrap:anywhere; }
   .chat-message.bot{ align-self:flex-start; }
-  .chat-message.bot p{ background:var(--navy-panel-2); color:var(--paper); border:1px solid var(--line-blue-soft); }
-  .chat-message.user{ align-self:flex-end; }
-  .chat-message.user p{ background:var(--copper); color:#12100D; }
-  .chat-message.typing p{ display:flex; gap:4px; align-items:center; padding:12px 14px; }
-  .chat-dot{ width:6px; height:6px; border-radius:50%; background:var(--paper-dim); animation:chatDot 1.2s infinite ease-in-out; }
-  .chat-dot:nth-child(2){ animation-delay:.15s; }
-  .chat-dot:nth-child(3){ animation-delay:.3s; }
-  @keyframes chatDot{ 0%,60%,100%{ opacity:.3; transform:translateY(0); } 30%{ opacity:1; transform:translateY(-3px); } }
-
-  .chat-suggestions{ display:flex; flex-wrap:wrap; gap:7px; padding:0 18px 14px; }
-  .chat-suggestion{ padding:6px 8px; border:1px solid var(--line-blue); background:transparent; color:var(--teal); font:11px 'JetBrains Mono', monospace; cursor:pointer; }
-  .chat-suggestion:hover, .chat-suggestion:focus-visible{ border-color:var(--teal); background:rgba(94,234,212,.08); outline:none; }
-  .chat-suggestion:disabled{ opacity:.4; cursor:default; }
-
-  .chat-form{ display:flex; gap:8px; padding:14px 18px; border-top:1px solid var(--line-blue-soft); }
-  .chat-input{
-    flex:1; background:var(--navy-panel-2); border:1px solid var(--line-blue-soft); color:var(--paper);
-    padding:10px 12px; font-family:'Inter', sans-serif; font-size:14px; border-radius:var(--radius);
-  }
-  .chat-input:focus{ outline:none; border-color:var(--teal); }
-  .chat-send{
-    background:var(--copper); color:#12100D; border:none; font-family:'JetBrains Mono', monospace;
-    font-size:13px; font-weight:600; padding:0 16px; border-radius:var(--radius); cursor:pointer;
-  }
-  .chat-send:hover{ background:#ffa066; }
-  .chat-send:disabled{ opacity:.5; cursor:default; }
-
+  .chat-message.user{ align-self:flex-end; max-width:88%; }
+  .chat-content{ padding:12px 14px; font-size:15px; line-height:1.6; border-radius:6px; }
+  .bot .chat-content{ background:var(--navy-panel-2); border:1px solid var(--line-blue-soft); }
+  .user .chat-content{ background:var(--copper); color:#12100D; }
+  .chat-content p{ margin:0; white-space:pre-wrap; }
+  .chat-content p + p{ margin-top:10px; }
+  .chat-content ul,.chat-content ol{ margin:0; padding-left:22px; }
+  .chat-content li{ margin:0; padding-left:2px; white-space:pre-wrap; }
+  .chat-content li + li{ margin-top:10px; }
+  .chat-content strong{ font-weight:600; }
+  .chat-content code{ font-size:.9em; font-family:'JetBrains Mono',monospace; }
+  .chat-suggestions{ display:flex; gap:8px; padding:0 16px 12px; flex-wrap:wrap; flex-shrink:0; }
+  .chat-suggestion,.chat-retry,.chat-jump{ padding:8px 10px; min-height:40px; border:1px solid var(--line-blue); border-radius:4px; background:transparent; color:var(--teal); font:14px 'Inter',sans-serif; cursor:pointer; }
+  .chat-suggestion:hover,.chat-retry:hover,.chat-jump:hover{ background:var(--navy-panel-2); }
+  .chat-feedback{ padding:0 16px 10px; font-size:13px; color:var(--paper-dim); flex-shrink:0; }
+  .chat-feedback:has(.chat-status:empty):not(:has(button:not([hidden]))){ display:none; }
+  .chat-status{ margin:0; }
+  .chat-status[data-error="true"]{ color:var(--paper); }
+  .chat-retry,.chat-jump{ margin-top:8px; }
+  .chat-form{ border-top:1px solid var(--line-blue-soft); padding:12px 16px 14px; flex-shrink:0; }
+  .chat-compose{ display:flex; gap:8px; align-items:flex-end; }
+  .chat-input{ flex:1; min-width:0; width:100%; resize:none; background:var(--navy-panel-2); border:1px solid var(--line-blue); color:var(--paper); padding:10px 12px; font:16px/1.45 'Inter',sans-serif; border-radius:4px; max-height:120px; }
+  .chat-input:focus{ border-color:var(--teal); }
+  .chat-send,.chat-stop{ min-height:46px; padding:0 14px; border:0; border-radius:4px; background:var(--copper); color:#12100D; font:600 14px 'Inter',sans-serif; cursor:pointer; }
+  .chat-send:disabled,.chat-suggestion:disabled,.chat-retry:disabled{ opacity:.5; cursor:default; }
+  .chat-input-meta{ display:flex; justify-content:space-between; gap:10px; margin-top:6px; font-size:12px; color:var(--paper-dim); }
+  .chat-note{ margin:8px 0 0; font-size:12px; line-height:1.5; color:var(--paper-dim); }
+  .chat-note a{ text-underline-offset:3px; }
+  .image-lightbox{ z-index:300; overflow:hidden; }
+  .image-lightbox img{ touch-action:pinch-zoom; }
+  .image-lightbox img.is-zoomed{ touch-action:none; }
+  .lightbox-close{ color:#E7EEF6; z-index:2; }
+  .lightbox-hint{ color:#B7C8D9; }
+  .lightbox-tools button:disabled{ opacity:.45; cursor:default; }
+  .lightbox-tools{ position:absolute; top:18px; left:18px; display:flex; flex-wrap:wrap; gap:6px; z-index:1; }
+  .lightbox-tools button{ min-width:40px; min-height:40px; border:1px solid #93A9BF; border-radius:4px; color:#E7EEF6; background:#0F2338; font:16px 'Inter',sans-serif; cursor:pointer; }
+  .gallery-dot{ width:24px; height:24px; background:transparent; opacity:1; display:grid; place-items:center; }
+  .gallery-dot::after{ content:''; width:8px; height:8px; background:var(--paper-dim); border-radius:50%; }
+  .gallery-dot.is-active{ background:transparent; transform:none; }
+  .gallery-dot.is-active::after{ background:var(--copper); }
+  .gallery-pagination{ gap:3px; flex-wrap:wrap; }
+  .gallery-arrow{ color:#E7EEF6; }
+  .project-body p{ text-align:left; }
+  .theme-toggle,.nav-toggle{ min-width:44px; min-height:44px; }
+  .reveal{ opacity:1; transform:none; }
   @media (max-width:480px){
-    .chat-panel{ right:16px; left:16px; width:auto; bottom:88px; }
-    .chat-launcher{ right:16px; bottom:16px; }
+    .chat-launcher{ right:16px; bottom:max(16px, env(safe-area-inset-bottom)); }
+    .chat-panel{ right:8px; left:8px; width:auto; max-width:none; bottom:max(8px, env(safe-area-inset-bottom)); height:calc(100vh - 16px); height:calc(100dvh - 16px); }
+    .chat-head{ padding:12px; }
+    .chat-head h2{ font-size:16px; }
+    .chat-messages{ padding:12px; }
+    .chat-suggestions{ padding:0 12px 10px; }
+    .chat-form{ padding:10px 12px 12px; }
+    .chat-message{ max-width:98%; }
+  }
+  .chat-panel.is-compact .chat-suggestions{ display:none; }
+  .chat-panel.is-compact .chat-input{ height:44px; }
+  .chat-panel.is-compact .chat-head{ padding:8px 12px; }
+  @media (prefers-reduced-motion:reduce){
+    *,*::before,*::after{ scroll-behavior:auto !important; animation:none !important; transition:none !important; }
   }
 </style>
 </head>
 <body>
+<a class="skip-link" href="#mainContent">Skip to main content</a>
 
 <!-- ============================================================
      HOW TO CUSTOMIZE THIS TEMPLATE
@@ -435,10 +466,11 @@
     </ul>
     <div class="nav-actions">
       <button class="theme-toggle" id="themeToggle" aria-label="Toggle light/dark theme" title="Toggle light/dark theme">☀</button>
-      <button class="nav-toggle" id="navToggle" aria-label="Toggle menu">☰</button>
+      <button class="nav-toggle" id="navToggle" aria-label="Open menu" aria-controls="navlinks" aria-expanded="false">☰</button>
     </div>
   </nav>
 </header>
+<main id="mainContent" tabindex="-1">
 
 <!-- ---------------- HERO ---------------- -->
 <section class="hero grid-bg" style="border-bottom:1px solid var(--line-blue-soft); padding-bottom:100px;">
@@ -446,7 +478,7 @@
     <div class="hero-inner bracket">
       <span class="b-tr"></span><span class="b-bl"></span>
       <div class="eyebrow">Mechatronic Engineer · Fresh Graduate</div>
-      <h1>Cheng<br><em>Jing Siang</em></h1>
+      <h1>Cheng Jing<br><em>Siang.</em></h1>
       <div class="role">Automation &amp; Embedded Systems — SolidWorks / Python / C / STM32 / Raspberry Pi</div>
       <p class="summary">
         First-Class Honours Master's graduate in Mechatronic Engineering, building AI-driven
@@ -544,7 +576,7 @@
             <li>Led the enclosure and internal mechanical design</li>
             <li>Integrated the AI model, camera, audio system, and supporting hardware into a working prototype</li>
           </ul>">
-          <img src="Image/Y3GP/1_ImageDetection.jpg" 
+          <img loading="lazy" decoding="async" src="Image/Y3GP/1_ImageDetection.jpg" 
           alt="Elephant image-detection system">
         </div>
         <div class="gallery-slide" data-figure="02" data-images="02" data-description=
@@ -565,7 +597,7 @@
             <li>Designed and 3D-printed custom holders for component mounting</li>
             <li>Translated the CAD design into an assembled and functioning prototype</li>
           </ul>">
-          <img src="Image/Y3GP/2_MechanicalDesign.png" 
+          <img loading="lazy" decoding="async" src="Image/Y3GP/2_MechanicalDesign.png" 
           alt="Mechanical design of the elephant detection device">
         </div>
         <div class="gallery-slide is-pair" data-figure="03" data-images="03" data-description=
@@ -585,9 +617,9 @@
             <li>Compared multiple metal thicknesses to support the final design decision</li>
             <li>Balanced mechanical strength and safety against overall enclosure weight</li>
           </ul>">
-          <img src="Image/Y3GP/3_Accuracy.jpg" 
+          <img loading="lazy" decoding="async" src="Image/Y3GP/3_Accuracy.jpg" 
           alt="YOLO image-detection accuracy results">
-          <img src="Image/Y3GP/3_MechanicalPlot.jpg" 
+          <img loading="lazy" decoding="async" src="Image/Y3GP/3_MechanicalPlot.jpg" 
           alt="Mechanical design analysis plot">
         </div>
         <div class="gallery-slide is-pair" data-figure="04" data-images="04" data-description=
@@ -610,8 +642,8 @@
             <li>Connected detection results to the wider logging and warning workflow</li>
             <li>Supported automatic Telegram alerts following confirmed detections</li>
           </ul>">
-          <img src="Image/Y3GP/4_DetectionLog.jpg" alt="Elephant detection event log">
-          <img src="Image/Y3GP/4_TelegramAlert.jpg" alt="Telegram early-warning alert">
+          <img loading="lazy" decoding="async" src="Image/Y3GP/4_DetectionLog.jpg" alt="Elephant detection event log">
+          <img loading="lazy" decoding="async" src="Image/Y3GP/4_TelegramAlert.jpg" alt="Telegram early-warning alert">
         </div>
       </div>
       <button class="gallery-arrow prev" type="button" aria-label="Previous project image">&#8249;</button>
@@ -676,7 +708,7 @@
             <li>Implemented LoRa peer-to-peer communication for remote result reporting</li>
             <li>Designed the system around periodic operation to support low-power deployment</li>
           </ul>">
-          <img src="Image/Y4FYP/1_SystemDiagram.png" alt="Overview of the Edge AI water leak detection system">
+          <img loading="lazy" decoding="async" src="Image/Y4FYP/1_SystemDiagram.png" alt="Overview of the Edge AI water leak detection system">
         </div>
         <div class="gallery-slide" data-figure="02" data-images="02" data-description="
           <p>The working prototype integrates the STM32 development board, sensing hardware, LoRa radio, battery, 
@@ -696,7 +728,7 @@
             <li>Used a pulse-support capacitor to handle short wireless-transmission current demands</li>
             <li>Assembled and validated the complete embedded hardware prototype</li>
           </ul>">
-          <img src="Image/Y4FYP/2_Components.png" alt="Components used in the water leak detection prototype">
+          <img loading="lazy" decoding="async" src="Image/Y4FYP/2_Components.png" alt="Components used in the water leak detection prototype">
         </div>
         <div class="gallery-slide" data-figure="03" data-images="03" data-description="
           <p>To develop and evaluate the AI system, I designed and built a controlled water-leak simulation rig 
@@ -716,7 +748,7 @@
             <li>Tested the device at different distances from the leak</li>
             <li>Reused the same rig for final embedded-system validation</li>
           </ul>">
-          <img src="Image/Y4FYP/3_SimulationRig.png" alt="Laboratory pipe rig used to simulate water leaks">
+          <img loading="lazy" decoding="async" src="Image/Y4FYP/3_SimulationRig.png" alt="Laboratory pipe rig used to simulate water leaks">
         </div>
         <div class="gallery-slide" data-figure="04" data-images="04" data-description="
           <p>Developing the AI models required a consistent way to collect large amounts of acoustic and vibration 
@@ -736,7 +768,7 @@
             <li>Converted raw recordings into AI-ready 512-sample datasets</li>
             <li>Reused the same recorded data for both NanoEdge AI and YAMNet evaluation</li>
           </ul>">
-          <img src="Image/Y4FYP/4_DataLogger.png" alt="Data logger used to capture pipe sound and vibration">
+          <img loading="lazy" decoding="async" src="Image/Y4FYP/4_DataLogger.png" alt="Data logger used to capture pipe sound and vibration">
         </div>
         <div class="gallery-slide is-pair" data-figure="05" data-images="05" data-description="
           <p>The collected acoustic and vibration recordings were analysed in both the time and frequency domains to 
@@ -757,8 +789,8 @@
             <li>Selected separate optimised models for acoustic and vibration sensing</li>
             <li>Exported and deployed the selected models onto the STM32 microcontroller</li>
           </ul>">
-          <img src="Image/Y4FYP/5_CollectedData.png" alt="Collected sensor data for leak detection">
-          <img src="Image/Y4FYP/5_OptimizedAlgorithm.png" alt="Optimised embedded AI algorithm">
+          <img loading="lazy" decoding="async" src="Image/Y4FYP/5_CollectedData.png" alt="Collected sensor data for leak detection">
+          <img loading="lazy" decoding="async" src="Image/Y4FYP/5_OptimizedAlgorithm.png" alt="Optimised embedded AI algorithm">
         </div>
         <div class="gallery-slide" data-figure="06" data-images="06" data-description="
           <p>Acoustic and vibration sensors provide different views of the same leak. Sound can be affected by surrounding 
@@ -777,7 +809,7 @@
             <li>Combined both sensor results only at the final decision stage</li>
             <li>Kept the architecture modular and suitable for a resource-constrained MCU</li>
           </ul>">
-          <img src="Image/Y4FYP/6_SensorFusion.png" alt="Sound and vibration sensor fusion process">
+          <img loading="lazy" decoding="async" src="Image/Y4FYP/6_SensorFusion.png" alt="Sound and vibration sensor fusion process">
         </div>
         <div class="gallery-slide" data-figure="07" data-images="07" data-description="
           <p>A single short AI prediction was not reliable enough for the final system because leak signals can fluctuate with 
@@ -796,7 +828,7 @@
             <li>Applied temporal rules to reduce the influence of short disturbances</li>
             <li>Combined the final acoustic and vibration scores through late fusion</li>
           </ul>">
-          <img src="Image/Y4FYP/7_DecisionFlow.png" alt="Water leak detection decision flow">
+          <img loading="lazy" decoding="async" src="Image/Y4FYP/7_DecisionFlow.png" alt="Water leak detection decision flow">
         </div>
         <div class="gallery-slide" data-figure="08" data-images="08" data-description="
           <p>I evaluated several versions of the AI models and decision logic directly on the working prototype using the 
@@ -815,7 +847,7 @@
             <li>Achieved 100% leak recall under controlled rig-based testing</li>
             <li>Identified false alarms as an area for further improvement</li>
           </ul>">
-          <img src="Image/Y4FYP/8_Accuracy.png" alt="Accuracy results for the embedded leak detection system">
+          <img loading="lazy" decoding="async" src="Image/Y4FYP/8_Accuracy.png" alt="Accuracy results for the embedded leak detection system">
         </div>
         <div class="gallery-slide is-pair" data-figure="09" data-images="09" data-description="
           <p>To evaluate whether a larger deep-learning model would perform better, I developed YAMNet-based acoustic and 
@@ -835,8 +867,8 @@
             <li>Compared the alternative models against the NanoEdge AI implementation</li>
             <li>Selected the approach that provided the better balance of accuracy and embedded deployability</li>
           </ul>">
-          <img src="Image/Y4FYP/9_YAMNetAccuracy.png" alt="YAMNet model accuracy comparison">
-          <img src="Image/Y4FYP/9_YAMNet-NEAI.png" alt="YAMNet and NanoEdge AI deployment comparison">
+          <img loading="lazy" decoding="async" src="Image/Y4FYP/9_YAMNetAccuracy.png" alt="YAMNet model accuracy comparison">
+          <img loading="lazy" decoding="async" src="Image/Y4FYP/9_YAMNet-NEAI.png" alt="YAMNet and NanoEdge AI deployment comparison">
         </div>
       </div>
       <button class="gallery-arrow prev" type="button" aria-label="Previous Project 02 image">&#8249;</button>
@@ -927,13 +959,14 @@
 </section>
 
 <!-- ---------------- CONTACT ---------------- -->
+</main>
 <footer id="contact" class="wrap reveal">
   <div class="contact-inner">
     <br>
     <h2>Let's build something. <span style="color:var(--copper)">Get in touch.</span></h2>
     <div class="contact-links">
       <a href="mailto:2306cjs@gmail.com">2306cjs@gmail.com</a>
-      <a href="tel:0125488250">012-548-8250</a>
+      <a href="tel:+60125488250">012-548-8250</a>
       <a href="https://linkedin.com/in/cheng-jing-siang-a83830268" target="_blank" rel="noopener noreferrer">LinkedIn ↗</a>
       <a href="https://github.com/JingSiang2306" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
     </div>
@@ -947,7 +980,14 @@
 <!-- Expanded image viewer for Project 01 -->
 <div class="image-lightbox" id="imageLightbox" role="dialog" aria-modal="true" aria-label="Expanded project image" aria-hidden="true">
   <button class="lightbox-close" type="button" aria-label="Close expanded image">&times;</button>
-  <img src="" alt="">
+  <div class="lightbox-tools" role="group" aria-label="Image controls">
+    <button type="button" data-action="previous" aria-label="Previous image">‹</button>
+    <button type="button" data-action="next" aria-label="Next image">›</button>
+    <button type="button" data-action="out" aria-label="Zoom out">−</button>
+    <button type="button" data-action="reset" aria-label="Reset zoom">100%</button>
+    <button type="button" data-action="in" aria-label="Zoom in">+</button>
+  </div>
+  <img alt="Expanded project image">
   <p class="lightbox-hint">Scroll to zoom · Drag to pan · Click outside or × to close</p>
 </div>
 
@@ -964,30 +1004,40 @@
       root.removeAttribute('data-theme');
       themeToggle.textContent = '☀';
     }
+    themeToggle.setAttribute('aria-label', theme === 'light' ? 'Switch to dark theme' : 'Switch to light theme');
+    themeToggle.setAttribute('aria-pressed', String(theme === 'light'));
   }
 
-  const saved = localStorage.getItem('portfolio-theme');
+  let saved;
+  try { saved = localStorage.getItem('portfolio-theme'); } catch { /* Storage can be disabled. */ }
   applyTheme(saved || 'dark');
 
   themeToggle.addEventListener('click', () => {
     const isLight = root.getAttribute('data-theme') === 'light';
     const next = isLight ? 'dark' : 'light';
     applyTheme(next);
-    localStorage.setItem('portfolio-theme', next);
+    try { localStorage.setItem('portfolio-theme', next); } catch { /* Theme still works for this visit. */ }
   });
 
   // Mobile nav toggle
   const navToggle = document.getElementById('navToggle');
   const navlinks = document.getElementById('navlinks');
-  navToggle.addEventListener('click', () => navlinks.classList.toggle('open'));
-  navlinks.querySelectorAll('a').forEach(a => a.addEventListener('click', () => navlinks.classList.remove('open')));
+  function setMenu(open) {
+    navlinks.classList.toggle('open', open);
+    navToggle.setAttribute('aria-expanded', String(open));
+    navToggle.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+    navlinks.inert = window.innerWidth <= 780 && !open;
+  }
+  setMenu(false);
+  window.addEventListener('resize', () => setMenu(false));
+  navToggle.addEventListener('click', () => setMenu(!navlinks.classList.contains('open')));
+  navlinks.querySelectorAll('a').forEach(a => a.addEventListener('click', () => setMenu(false)));
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape' && navlinks.classList.contains('open')) { setMenu(false); navToggle.focus(); }
+  });
+  document.addEventListener('click', event => { if (!event.target.closest('nav')) setMenu(false); });
 
-  // Scroll reveal
-  const reveals = document.querySelectorAll('.reveal');
-  const io = new IntersectionObserver((entries) => {
-    entries.forEach(e => { if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } });
-  }, { threshold: 0.12 });
-  reveals.forEach(el => io.observe(el));
+  // Content stays visible even when scripts or browser storage are unavailable.
 
   // Project 01 image gallery: one numbered figure at a time, with paired
   // source images kept together in their original proportions.
@@ -1023,129 +1073,137 @@
     showSlide(0);
   }
 
-  // Click any Project 01 image to inspect it. Mouse wheel zooms the expanded image.
-  const imageLightbox = document.getElementById('imageLightbox');
-  if(imageLightbox && elephantGallery){
-    const lightboxImage = imageLightbox.querySelector('img');
-    const closeLightboxButton = imageLightbox.querySelector('.lightbox-close');
-    let zoom = 1;
-    let panX = 0;
-    let panY = 0;
-    let isPanning = false;
-    let pointerStartX = 0;
-    let pointerStartY = 0;
-    let panStartX = 0;
-    let panStartY = 0;
-    let lastFocusedElement;
-    const expandedImages = [...elephantGallery.querySelectorAll('.gallery-slide img')];
-    let expandedImageIndex = 0;
+  // Shared, keyboard-accessible image viewer for both project galleries.
+  function setupLightbox(gallery, box) {
+    if (!gallery || !box) return;
+    const images = [...gallery.querySelectorAll('.gallery-slide img')];
+    const image = box.querySelector('img');
+    const close = box.querySelector('.lightbox-close');
+    const previous = box.querySelector('[data-action="previous"]');
+    const next = box.querySelector('[data-action="next"]');
+    const zoomOut = box.querySelector('[data-action="out"]');
+    const zoomIn = box.querySelector('[data-action="in"]');
+    const reset = box.querySelector('[data-action="reset"]');
+    let index = 0, zoom = 1, x = 0, y = 0, drag = null;
+    let background = [];
 
-    function applyImageTransform(){
-      lightboxImage.style.transform = `translate(${panX}px, ${panY}px) scale(${zoom})`;
-      lightboxImage.classList.toggle('is-zoomed', zoom > 1);
+    function transform() {
+      const maxX = image.clientWidth * (zoom - 1) / 2;
+      const maxY = image.clientHeight * (zoom - 1) / 2;
+      x = Math.max(-maxX, Math.min(maxX, x));
+      y = Math.max(-maxY, Math.min(maxY, y));
+      image.style.transform = `translate(${x}px, ${y}px) scale(${zoom})`;
+      image.classList.toggle('is-zoomed', zoom > 1);
+      zoomOut.disabled = zoom <= 1;
+      zoomIn.disabled = zoom >= 3;
+      reset.textContent = `${Math.round(zoom * 100)}%`;
     }
-
-    function closeLightbox(){
-      imageLightbox.classList.remove('is-open');
-      imageLightbox.setAttribute('aria-hidden', 'true');
-      document.body.classList.remove('lightbox-open');
-      lightboxImage.src = '';
-      zoom = 1;
-      panX = 0;
-      panY = 0;
-      lightboxImage.classList.remove('is-zoomed', 'is-panning');
-      if(lastFocusedElement){
-        const slideIndex = [...elephantGallery.querySelectorAll('.gallery-slide')].indexOf(lastFocusedElement.closest('.gallery-slide'));
-        elephantGallery.showSlide(slideIndex);
-        requestAnimationFrame(() => {
-          lastFocusedElement.scrollIntoView({ behavior:'smooth', block:'center' });
-          lastFocusedElement.focus({ preventScroll:true });
-        });
-      }
+    function stopDrag(event) {
+      if (!drag) return;
+      const pointerId = drag.pointerId;
+      drag = null;
+      image.classList.remove('is-panning');
+      if (image.hasPointerCapture?.(pointerId)) image.releasePointerCapture(pointerId);
     }
-
-    function showExpandedImage(index){
-      expandedImageIndex = (index + expandedImages.length) % expandedImages.length;
-      const sourceImage = expandedImages[expandedImageIndex];
-      lastFocusedElement = sourceImage;
-      lightboxImage.src = sourceImage.currentSrc || sourceImage.src;
-      lightboxImage.alt = sourceImage.alt;
-      zoom = 1;
-      panX = 0;
-      panY = 0;
-      applyImageTransform();
-      const slideIndex = [...elephantGallery.querySelectorAll('.gallery-slide')].indexOf(sourceImage.closest('.gallery-slide'));
-      elephantGallery.showSlide(slideIndex);
+    function setZoom(value) {
+      zoom = Math.round(Math.max(1, Math.min(3, value)) * 100) / 100;
+      if (zoom === 1) { x = 0; y = 0; stopDrag(); }
+      transform();
     }
-
-    function openLightbox(sourceImage){
-      showExpandedImage(expandedImages.indexOf(sourceImage));
-      imageLightbox.classList.add('is-open');
-      imageLightbox.setAttribute('aria-hidden', 'false');
+    function show(value) {
+      stopDrag();
+      index = (value + images.length) % images.length;
+      const source = images[index];
+      image.src = source.currentSrc || source.src;
+      image.alt = source.alt;
+      x = 0; y = 0; setZoom(1);
+      gallery.showSlide([...gallery.querySelectorAll('.gallery-slide')].indexOf(source.closest('.gallery-slide')));
+      box.querySelector('.lightbox-hint').textContent = `${index + 1} / ${images.length} · Use arrows to browse, + / − to zoom, and drag to pan. Escape closes.`;
+    }
+    function open(value) {
+      document.dispatchEvent(new Event('portfolio:lightbox-open'));
+      show(value);
+      box.classList.add('is-open');
+      box.setAttribute('aria-hidden', 'false');
       document.body.classList.add('lightbox-open');
-      closeLightboxButton.focus();
+      background = [...document.body.children].filter(node => node !== box && node.tagName !== 'SCRIPT').map(node => [node, node.inert]);
+      background.forEach(([node]) => { node.inert = true; });
+      close.focus();
     }
-
-    lightboxImage.draggable = false;
-
-    elephantGallery.querySelectorAll('.gallery-slide img').forEach(image => {
-      image.setAttribute('tabindex', '0');
-      image.setAttribute('role', 'button');
-      image.setAttribute('aria-label', `Expand: ${image.alt}`);
-      image.addEventListener('click', () => openLightbox(image));
-      image.addEventListener('keydown', event => {
-        if(event.key === 'Enter' || event.key === ' '){ event.preventDefault(); openLightbox(image); }
+    function dismiss() {
+      stopDrag();
+      box.classList.remove('is-open');
+      box.setAttribute('aria-hidden', 'true');
+      document.body.classList.remove('lightbox-open');
+      background.forEach(([node, wasInert]) => { node.inert = wasInert; });
+      background = [];
+      image.removeAttribute('src');
+      images[index].focus({preventScroll:true});
+      images[index].scrollIntoView({behavior:'auto', block:'nearest'});
+    }
+    images.forEach((source, i) => {
+      source.tabIndex = 0;
+      source.setAttribute('role', 'button');
+      source.setAttribute('aria-label', `Expand: ${source.alt}`);
+      source.addEventListener('click', () => open(i));
+      source.addEventListener('keydown', event => {
+        if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); open(i); }
       });
     });
-
-    closeLightboxButton.addEventListener('click', closeLightbox);
-    imageLightbox.addEventListener('click', event => { if(event.target === imageLightbox) closeLightbox(); });
-    imageLightbox.addEventListener('wheel', event => {
+    image.draggable = false;
+    close.addEventListener('click', dismiss);
+    previous.addEventListener('click', () => show(index - 1));
+    next.addEventListener('click', () => show(index + 1));
+    zoomOut.addEventListener('click', () => setZoom(zoom - .25));
+    zoomIn.addEventListener('click', () => setZoom(zoom + .25));
+    reset.addEventListener('click', () => { x = 0; y = 0; setZoom(1); });
+    box.addEventListener('click', event => { if (event.target === box) dismiss(); });
+    box.addEventListener('wheel', event => { event.preventDefault(); setZoom(zoom + (event.deltaY < 0 ? .15 : -.15)); }, {passive:false});
+    image.addEventListener('pointerdown', event => {
+      if (zoom <= 1 || event.button !== 0) return;
       event.preventDefault();
-      zoom = Math.min(3, Math.max(1, zoom + (event.deltaY < 0 ? 0.15 : -0.15)));
-      if(zoom === 1){ panX = 0; panY = 0; }
-      applyImageTransform();
-    }, { passive:false });
-    lightboxImage.addEventListener('pointerdown', event => {
-      if(zoom <= 1 || event.button !== 0) return;
-      event.preventDefault();
-      isPanning = true;
-      pointerStartX = event.clientX;
-      pointerStartY = event.clientY;
-      panStartX = panX;
-      panStartY = panY;
-      lightboxImage.setPointerCapture(event.pointerId);
-      lightboxImage.classList.add('is-panning');
+      drag = {pointerId:event.pointerId, startX:event.clientX, startY:event.clientY, x, y};
+      image.setPointerCapture(event.pointerId);
+      image.classList.add('is-panning');
     });
-    lightboxImage.addEventListener('pointermove', event => {
-      if(!isPanning) return;
-      panX = panStartX + event.clientX - pointerStartX;
-      panY = panStartY + event.clientY - pointerStartY;
-      applyImageTransform();
+    image.addEventListener('pointermove', event => {
+      if (!drag || event.pointerId !== drag.pointerId) return;
+      x = drag.x + event.clientX - drag.startX;
+      y = drag.y + event.clientY - drag.startY;
+      transform();
     });
-    function stopPanning(event){
-      if(!isPanning) return;
-      isPanning = false;
-      lightboxImage.classList.remove('is-panning');
-      if(event && lightboxImage.hasPointerCapture(event.pointerId)) lightboxImage.releasePointerCapture(event.pointerId);
-    }
-    lightboxImage.addEventListener('pointerup', stopPanning);
-    lightboxImage.addEventListener('pointercancel', stopPanning);
-    lightboxImage.addEventListener('dragstart', event => event.preventDefault());
-    imageLightbox.addEventListener('contextmenu', event => event.preventDefault());
+    image.addEventListener('pointerup', stopDrag);
+    image.addEventListener('pointercancel', stopDrag);
+    image.addEventListener('lostpointercapture', stopDrag);
     document.addEventListener('keydown', event => {
-      if(!imageLightbox.classList.contains('is-open')) return;
-      if(event.key === 'Escape') closeLightbox();
-      if(event.key === 'ArrowLeft'){ event.preventDefault(); showExpandedImage(expandedImageIndex - 1); }
-      if(event.key === 'ArrowRight'){ event.preventDefault(); showExpandedImage(expandedImageIndex + 1); }
+      if (!box.classList.contains('is-open')) return;
+      if (event.key === 'Escape') { event.preventDefault(); dismiss(); }
+      if (event.key === 'ArrowLeft') { event.preventDefault(); show(index - 1); }
+      if (event.key === 'ArrowRight') { event.preventDefault(); show(index + 1); }
+      if (event.key === '+' || event.key === '=') { event.preventDefault(); setZoom(zoom + .25); }
+      if (event.key === '-') { event.preventDefault(); setZoom(zoom - .25); }
+      if (event.key === 'Tab') {
+        const buttons = [...box.querySelectorAll('button:not(:disabled)')];
+        const first = buttons[0], last = buttons.at(-1);
+        if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+        else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+      }
     });
   }
+  setupLightbox(elephantGallery, document.getElementById('imageLightbox'));
 </script>
 
 <!-- Project 02 uses the same expandable, zoomable gallery interaction as Project 01. -->
 <div class="image-lightbox" id="leakLightbox" role="dialog" aria-modal="true" aria-label="Expanded Project 02 image" aria-hidden="true">
   <button class="lightbox-close" type="button" aria-label="Close expanded image">&times;</button>
-  <img src="" alt="">
+  <div class="lightbox-tools" role="group" aria-label="Image controls">
+    <button type="button" data-action="previous" aria-label="Previous image">‹</button>
+    <button type="button" data-action="next" aria-label="Next image">›</button>
+    <button type="button" data-action="out" aria-label="Zoom out">−</button>
+    <button type="button" data-action="reset" aria-label="Reset zoom">100%</button>
+    <button type="button" data-action="in" aria-label="Zoom in">+</button>
+  </div>
+  <img alt="Expanded project image">
   <p class="lightbox-hint">Scroll to zoom · Drag to pan · Click outside or × to close</p>
 </div>
 
@@ -1180,250 +1238,285 @@
     dots.forEach(dot => dot.addEventListener('click', () => showSlide(Number(dot.dataset.slide))));
     showSlide(0);
 
-    const leakLightbox = document.getElementById('leakLightbox');
-    const lightboxImage = leakLightbox.querySelector('img');
-    const closeButton = leakLightbox.querySelector('.lightbox-close');
-    const galleryImages = [...leakGallery.querySelectorAll('.gallery-slide img')];
-    let expandedIndex = 0;
-    let zoom = 1;
-    let panX = 0;
-    let panY = 0;
-    let panning = false;
-    let startX = 0;
-    let startY = 0;
-    let startPanX = 0;
-    let startPanY = 0;
-    let triggerImage;
-
-    function applyTransform(){
-      lightboxImage.style.transform = `translate(${panX}px, ${panY}px) scale(${zoom})`;
-      lightboxImage.classList.toggle('is-zoomed', zoom > 1);
-    }
-
-    function showExpanded(index){
-      expandedIndex = (index + galleryImages.length) % galleryImages.length;
-      const image = galleryImages[expandedIndex];
-      triggerImage = image;
-      lightboxImage.src = image.currentSrc || image.src;
-      lightboxImage.alt = image.alt;
-      zoom = 1;
-      panX = 0;
-      panY = 0;
-      applyTransform();
-      leakGallery.showSlide(slides.indexOf(image.closest('.gallery-slide')));
-    }
-
-    function closeLightbox(){
-      leakLightbox.classList.remove('is-open');
-      leakLightbox.setAttribute('aria-hidden', 'true');
-      document.body.classList.remove('lightbox-open');
-      lightboxImage.src = '';
-      if(triggerImage){
-        triggerImage.focus({ preventScroll:true });
-      }
-    }
-
-    function openLightbox(image){
-      showExpanded(galleryImages.indexOf(image));
-      leakLightbox.classList.add('is-open');
-      leakLightbox.setAttribute('aria-hidden', 'false');
-      document.body.classList.add('lightbox-open');
-      closeButton.focus();
-    }
-
-    galleryImages.forEach(image => {
-      image.setAttribute('tabindex', '0');
-      image.setAttribute('role', 'button');
-      image.setAttribute('aria-label', `Expand: ${image.alt}`);
-      image.addEventListener('click', () => openLightbox(image));
-      image.addEventListener('keydown', event => {
-        if(event.key === 'Enter' || event.key === ' '){ event.preventDefault(); openLightbox(image); }
-      });
-    });
-
-    lightboxImage.draggable = false;
-    closeButton.addEventListener('click', closeLightbox);
-    leakLightbox.addEventListener('click', event => { if(event.target === leakLightbox) closeLightbox(); });
-    leakLightbox.addEventListener('wheel', event => {
-      event.preventDefault();
-      zoom = Math.min(3, Math.max(1, zoom + (event.deltaY < 0 ? 0.15 : -0.15)));
-      if(zoom === 1){ panX = 0; panY = 0; }
-      applyTransform();
-    }, { passive:false });
-    lightboxImage.addEventListener('pointerdown', event => {
-      if(zoom <= 1 || event.button !== 0) return;
-      event.preventDefault();
-      panning = true;
-      startX = event.clientX;
-      startY = event.clientY;
-      startPanX = panX;
-      startPanY = panY;
-      lightboxImage.setPointerCapture(event.pointerId);
-      lightboxImage.classList.add('is-panning');
-    });
-    lightboxImage.addEventListener('pointermove', event => {
-      if(!panning) return;
-      panX = startPanX + event.clientX - startX;
-      panY = startPanY + event.clientY - startY;
-      applyTransform();
-    });
-    function stopPanning(event){
-      if(!panning) return;
-      panning = false;
-      lightboxImage.classList.remove('is-panning');
-      if(lightboxImage.hasPointerCapture(event.pointerId)) lightboxImage.releasePointerCapture(event.pointerId);
-    }
-    lightboxImage.addEventListener('pointerup', stopPanning);
-    lightboxImage.addEventListener('pointercancel', stopPanning);
-    document.addEventListener('keydown', event => {
-      if(!leakLightbox.classList.contains('is-open')) return;
-      if(event.key === 'Escape') closeLightbox();
-      if(event.key === 'ArrowLeft'){ event.preventDefault(); showExpanded(expandedIndex - 1); }
-      if(event.key === 'ArrowRight'){ event.preventDefault(); showExpanded(expandedIndex + 1); }
-    });
+    setupLightbox(leakGallery, document.getElementById('leakLightbox'));
   }
 </script>
 
-<!-- ============================================================
-     AI PORTFOLIO ASSISTANT
-     This calls a real AI model through the /api/chat serverless
-     function (see api/chat.js) — it is NOT keyword matching or
-     pre-written answers. The function grounds every answer in the
-     full text of the Knowledge folder documents (Resume, Project 01
-     thesis + slides, Project 02 thesis).
-
-     IMPORTANT: this only works once /api/chat.js is deployed on a
-     platform that runs serverless functions (Vercel, Netlify, etc.)
-     with an ANTHROPIC_API_KEY environment variable set. Opening this
-     HTML file directly in a browser will NOT make the chatbot work —
-     see the deployment README included alongside this file.
-============================================================= -->
-<button class="chat-launcher" id="chatLauncher" type="button" aria-label="Open portfolio assistant" aria-expanded="false" aria-controls="portfolioChat">✦</button>
-<aside class="chat-panel" id="portfolioChat" aria-label="Portfolio assistant" aria-hidden="true">
+<!-- AI assistant: api/chat.js calls OpenAI using knowledge_v2.1.js. -->
+<button class="chat-launcher" id="chatLauncher" type="button" aria-label="Open portfolio assistant" aria-expanded="false" aria-controls="portfolioChat">Ask about my work</button>
+<aside class="chat-panel" id="portfolioChat" role="dialog" aria-labelledby="chatTitle" hidden inert>
   <div class="chat-head">
-    <div><p class="chat-eyebrow">Portfolio assistant</p><h2>Ask about Jing Siang or the projects</h2></div>
-    <button class="chat-close" id="chatClose" type="button" aria-label="Close portfolio assistant">&times;</button>
+    <div><p class="chat-eyebrow">Portfolio assistant</p><h2 id="chatTitle">Ask about Jing Siang’s work</h2></div>
+    <div class="chat-head-actions">
+      <button class="chat-reset" id="chatReset" type="button" title="Clear this conversation">New chat</button>
+      <button class="chat-close" id="chatClose" type="button" aria-label="Close portfolio assistant">&times;</button>
+    </div>
   </div>
-  <div class="chat-messages" id="chatMessages" aria-live="polite">
-    <div class="chat-message bot"><p>Hi! I'm an AI assistant trained on Jing Siang's resume and both project write-ups. Ask me anything.</p></div>
-  </div>
+  <div class="chat-messages" id="chatMessages" role="log" aria-label="Chat messages" aria-live="polite" aria-relevant="additions" aria-atomic="false"></div>
   <div class="chat-suggestions" id="chatSuggestions" aria-label="Suggested questions">
-    <button class="chat-suggestion" type="button">Who is Jing Siang?</button>
-    <button class="chat-suggestion" type="button">Tell me about Project 01</button>
-    <button class="chat-suggestion" type="button">How did Project 02 perform?</button>
+    <button class="chat-suggestion" type="button" data-question="Who is Jing Siang?">About Jing Siang</button>
+    <button class="chat-suggestion" type="button" data-question="Summarize Project 01 in 4 important bullet points.">Project 01 highlights</button>
+    <button class="chat-suggestion" type="button" data-question="Summarize Project 02 in 4 important bullet points.">Project 02 highlights</button>
+  </div>
+  <div class="chat-feedback">
+    <p class="chat-status" id="chatStatus" role="status" aria-live="polite"></p>
+    <button class="chat-retry" id="chatRetry" type="button" hidden>Retry question</button>
+    <button class="chat-jump" id="chatJump" type="button" hidden>New reply ↓</button>
   </div>
   <form class="chat-form" id="chatForm">
-    <input class="chat-input" id="chatInput" type="text" autocomplete="off" placeholder="Ask a question..." aria-label="Ask the portfolio assistant">
-    <button class="chat-send" id="chatSend" type="submit">Send</button>
+    <div class="chat-compose">
+      <textarea class="chat-input" id="chatInput" rows="2" maxlength="1200" autocomplete="off" placeholder="Ask a question…" aria-label="Your question" aria-describedby="chatInputHint chatCount"></textarea>
+      <button class="chat-send" id="chatSend" type="submit" disabled>Send</button>
+      <button class="chat-stop" id="chatStop" type="button" hidden>Stop</button>
+    </div>
+    <div class="chat-input-meta"><span id="chatInputHint">Enter to send · Shift+Enter for a new line</span><span id="chatCount">0 / 1200</span></div>
+    <p class="chat-note">AI answers from portfolio notes may contain mistakes. <a href="#contact" id="chatContact">Contact Jing Siang</a>. Questions and recent replies are sent to OpenAI.</p>
   </form>
 </aside>
+<noscript><p class="wrap">The galleries and AI assistant need JavaScript. You can still read the portfolio and contact Jing Siang by email.</p></noscript>
 
 <script>
-  // Real AI chatbot front-end. No hardcoded answers or keyword matching here —
-  // every reply comes from the /api/chat serverless function, which calls the
-  // Anthropic API with the full Knowledge folder documents as context.
+(() => {
   const chatLauncher = document.getElementById('chatLauncher');
   const chatPanel = document.getElementById('portfolioChat');
-  const chatClose = document.getElementById('chatClose');
   const chatMessages = document.getElementById('chatMessages');
-  const chatForm = document.getElementById('chatForm');
   const chatInput = document.getElementById('chatInput');
   const chatSend = document.getElementById('chatSend');
-  const chatSuggestions = document.getElementById('chatSuggestions');
-
-  const CHAT_ENDPOINT = '/api/chat';
+  const chatStop = document.getElementById('chatStop');
+  const chatStatus = document.getElementById('chatStatus');
+  const chatRetry = document.getElementById('chatRetry');
+  const chatJump = document.getElementById('chatJump');
+  const suggestions = document.getElementById('chatSuggestions');
+  const MAX_MESSAGE = 1200;
+  const MAX_HISTORY_ITEM = 2400;
+  const REQUEST_TIMEOUT = 30000;
   let conversationHistory = [];
-  let isWaiting = false;
+  let pending = null;
+  let retryRequest = null;
+  let retryTimer = null;
+  let returnFocus = null;
 
-  function addChatMessage(text, role){
-    const bubble = document.createElement('div');
-    bubble.className = `chat-message ${role}`;
-    const p = document.createElement('p');
-    p.textContent = text;
-    bubble.appendChild(p);
-    chatMessages.appendChild(bubble);
+  function scrollToLatest() {
     chatMessages.scrollTop = chatMessages.scrollHeight;
-    return bubble;
+    chatJump.hidden = true;
   }
-
-  function showTyping(){
-    const bubble = document.createElement('div');
-    bubble.className = 'chat-message bot typing';
-    bubble.innerHTML = '<p><span class="chat-dot"></span><span class="chat-dot"></span><span class="chat-dot"></span></p>';
-    chatMessages.appendChild(bubble);
-    chatMessages.scrollTop = chatMessages.scrollHeight;
-    return bubble;
+  function isNearBottom() {
+    return chatMessages.scrollHeight - chatMessages.scrollTop - chatMessages.clientHeight < 80;
   }
-
-  function setWaiting(waiting){
-    isWaiting = waiting;
-    chatInput.disabled = waiting;
-    chatSend.disabled = waiting;
-    chatSuggestions.querySelectorAll('.chat-suggestion').forEach(btn => btn.disabled = waiting);
+  function status(text, error = false) {
+    chatStatus.textContent = text;
+    chatStatus.dataset.error = String(error);
   }
-
-  async function sendToAssistant(question){
-    addChatMessage(question, 'user');
-    setWaiting(true);
-    const typingBubble = showTyping();
-
-    try {
-      const response = await fetch(CHAT_ENDPOINT, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: question, history: conversationHistory })
-      });
-
-      const data = await response.json().catch(() => ({}));
-      typingBubble.remove();
-
-      if(!response.ok || !data.reply){
-        addChatMessage(data.error || "I couldn't reach the AI backend just now. Please try again in a moment, or contact Jing Siang directly.", 'bot');
-        return;
-      }
-
-      addChatMessage(data.reply, 'bot');
-      conversationHistory.push({ role: 'user', content: question });
-      conversationHistory.push({ role: 'assistant', content: data.reply });
-    } catch (err) {
-      typingBubble.remove();
-      addChatMessage("I'm having trouble connecting right now. Please try again shortly, or reach Jing Siang directly via the contact section.", 'bot');
-    } finally {
-      setWaiting(false);
+  function updateControls() {
+    const length = chatInput.value.length;
+    document.getElementById('chatCount').textContent = `${length} / ${MAX_MESSAGE}`;
+    chatSend.disabled = !!pending || !chatInput.value.trim() || length > MAX_MESSAGE;
+    chatSend.hidden = !!pending;
+    chatStop.hidden = !pending;
+    suggestions.querySelectorAll('button').forEach(button => { button.disabled = !!pending; });
+  }
+  // Inline emphasis is parsed into text nodes; model output never becomes HTML.
+  function appendInline(parent, text) {
+    const tokens = String(text).split(/(\*\*[^*\n]+\*\*|`[^`\n]+`)/g);
+    for (const token of tokens) {
+      if (token.startsWith('**') && token.endsWith('**') && token.length > 4) {
+        const strong = document.createElement('strong');
+        strong.textContent = token.slice(2, -2);
+        parent.appendChild(strong);
+      } else if (token.startsWith('`') && token.endsWith('`') && token.length > 2) {
+        const code = document.createElement('code');
+        code.textContent = token.slice(1, -1);
+        parent.appendChild(code);
+      } else parent.appendChild(document.createTextNode(token));
     }
   }
-
-  function setChatOpen(open){
-    chatPanel.classList.toggle('is-open', open);
-    chatPanel.setAttribute('aria-hidden', String(!open));
-    chatLauncher.setAttribute('aria-expanded', String(open));
-    if(open) requestAnimationFrame(() => chatInput.focus());
-    else chatLauncher.focus();
+  function renderLegacy(content, text) {
+    // Compatibility with an older backend: recognize only actual line-based lists.
+    let list = null;
+    for (const line of text.split(/\r?\n/)) {
+      if (!line.trim()) { continue; }
+      const bullet = line.match(/^\s*[-*•]\s+(.+)$/);
+      const numbered = line.match(/^\s*\d+[.)]\s+(.+)$/);
+      if (bullet || numbered) {
+        const tag = numbered ? 'OL' : 'UL';
+        if (!list || list.tagName !== tag) {
+          list = document.createElement(tag.toLowerCase());
+          content.appendChild(list);
+        }
+        const li = document.createElement('li');
+        appendInline(li, (numbered || bullet)[1]);
+        list.appendChild(li);
+      } else {
+        list = null;
+        const p = document.createElement('p');
+        appendInline(p, line.replace(/^#{1,6}\s+/, ''));
+        content.appendChild(p);
+      }
+    }
   }
-
-  chatLauncher.addEventListener('click', () => setChatOpen(!chatPanel.classList.contains('is-open')));
-  chatClose.addEventListener('click', () => setChatOpen(false));
-
-  chatSuggestions.querySelectorAll('.chat-suggestion').forEach(button => {
-    button.addEventListener('click', () => {
-      if(isWaiting) return;
-      sendToAssistant(button.textContent);
-    });
-  });
-
-  chatForm.addEventListener('submit', event => {
-    event.preventDefault();
-    if(isWaiting) return;
-    const question = chatInput.value.trim();
-    if(!question) return;
+  function addChatMessage(answer, role, forceScroll = false) {
+    const follow = forceScroll || isNearBottom();
+    const bubble = document.createElement('div');
+    bubble.className = `chat-message ${role === 'user' ? 'user' : 'bot'}`;
+    bubble.setAttribute('role', 'group');
+    bubble.setAttribute('aria-label', role === 'user' ? 'You' : 'Portfolio assistant');
+    const content = document.createElement('div');
+    content.className = 'chat-content';
+    if (role === 'user') {
+      const p = document.createElement('p');
+      p.textContent = answer;
+      content.appendChild(p);
+    } else if (answer && Array.isArray(answer.items) && ['paragraphs','bullets','numbered'].includes(answer.format)) {
+      const parent = answer.format === 'paragraphs' ? content : document.createElement(answer.format === 'numbered' ? 'ol' : 'ul');
+      for (const item of answer.items) {
+        const element = document.createElement(answer.format === 'paragraphs' ? 'p' : 'li');
+        const clean = answer.format === 'paragraphs' ? item : item.replace(/^\s*(?:[-*•]|\d+[.)])\s+/, '');
+        appendInline(element, clean);
+        parent.appendChild(element);
+      }
+      if (parent !== content) content.appendChild(parent);
+    } else renderLegacy(content, typeof answer === 'string' ? answer : answer.reply);
+    bubble.appendChild(content);
+    chatMessages.appendChild(bubble);
+    // Keep the visible conversation bounded, independent of model context.
+    while (chatMessages.children.length > 60) chatMessages.firstElementChild.remove();
+    if (follow) scrollToLatest();
+    else chatJump.hidden = false;
+    return bubble;
+  }
+  function clearRetry() {
+    clearTimeout(retryTimer);
+    retryRequest = null;
+    chatRetry.hidden = true;
+    chatRetry.disabled = false;
+    chatRetry.textContent = 'Retry question';
+  }
+  function showRetry(request, delay = 0) {
+    retryRequest = request;
+    chatRetry.hidden = false;
+    chatRetry.disabled = delay > 0;
+    chatRetry.textContent = delay > 0 ? `Retry in ${delay}s` : 'Retry question';
+    if (delay > 0) retryTimer = setTimeout(() => {
+      chatRetry.disabled = false;
+      chatRetry.textContent = 'Retry question';
+    }, delay * 1000);
+  }
+  function usableAnswer(data) {
+    if (!data || typeof data.reply !== 'string' || !data.reply.trim() || data.reply.length > 12000) return false;
+    if ('items' in data) return ['paragraphs','bullets','numbered'].includes(data.format) && Array.isArray(data.items) && data.items.length > 0 && data.items.length <= 8 && data.items.every(item => typeof item === 'string' && item.trim() && item.length <= 1200);
+    return true;
+  }
+  async function sendToAssistant(question, retry = null) {
+    question = question.trim();
+    if (pending || !question) return;
+    if (question.length > MAX_MESSAGE) { status(`Please use no more than ${MAX_MESSAGE} characters.`, true); return; }
+    if (location.protocol === 'file:') { status('The assistant is available on the hosted portfolio. Please use the contact section while viewing this local file.', true); return; }
+    if (navigator.onLine === false) { status('You appear to be offline. Reconnect and try again.', true); return; }
+    clearRetry();
+    const history = (retry?.history || conversationHistory).slice(-6);
+    const request = { question, history, controller: new AbortController(), stopped: false, timedOut: false };
+    pending = request;
+    if (!retry) {
+      addChatMessage(question, 'user', true);
+      chatInput.value = '';
+    }
+    suggestions.hidden = true;
+    status('Preparing an answer…');
+    updateControls();
+    const slowTimer = setTimeout(() => { if (pending === request) status('Still working… You can stop and try again.'); }, 8000);
+    const timeout = setTimeout(() => { request.timedOut = true; request.controller.abort(); }, REQUEST_TIMEOUT);
+    try {
+      // Bound payload bytes too, so multi-byte text cannot exceed the server limit.
+      const payload = { message: question, history: history.map(item => ({ role: item.role, content: item.content.slice(0, MAX_HISTORY_ITEM) })) };
+      while (new TextEncoder().encode(JSON.stringify(payload)).length > 22000 && payload.history.length) payload.history.splice(0, 2);
+      const response = await fetch('/api/chat', {
+        method:'POST', headers:{ 'Content-Type':'application/json' },
+        signal:request.controller.signal, body:JSON.stringify(payload)
+      });
+      const data = await response.json().catch(() => null);
+      if (pending !== request) return;
+      if (request.controller.signal.aborted) throw new Error('ABORTED');
+      if (!response.ok) {
+        const message = typeof data?.error === 'string' ? data.error : 'The assistant is unavailable. Please retry or use the contact section.';
+        status(message, true);
+        const delay = Math.min(60, Math.max(0, Math.ceil(Number(response.headers.get('Retry-After')) || 0)));
+        if (data?.retryable !== false && response.status !== 404 && response.status !== 405) showRetry({ question, history }, delay);
+        return;
+      }
+      if (!usableAnswer(data)) throw new Error('INVALID_REPLY');
+      addChatMessage(data, 'bot');
+      conversationHistory = [...history, { role:'user', content:question }, { role:'assistant', content:data.reply.slice(0, MAX_HISTORY_ITEM) }].slice(-6);
+      status('');
+    } catch (err) {
+      if (pending !== request) return;
+      status(request.stopped ? 'Stopped. Retry this question or ask something else.' : request.timedOut ? 'The response took too long. Please retry.' : 'The reply could not be received. Please retry or use the contact section.', true);
+      showRetry({ question, history });
+    } finally {
+      clearTimeout(timeout);
+      clearTimeout(slowTimer);
+      if (pending === request) {
+        pending = null;
+        updateControls();
+        if (!chatPanel.hidden && (document.activeElement === chatStop || document.activeElement === chatSend)) chatInput.focus();
+      }
+    }
+  }
+  function updateMobileViewport() {
+    chatPanel.classList.toggle('is-compact', !!window.visualViewport && window.visualViewport.height < 500);
+    if (chatPanel.hidden || !window.visualViewport || window.innerWidth > 480) {
+      chatPanel.style.removeProperty('height'); chatPanel.style.removeProperty('top'); chatPanel.style.removeProperty('bottom'); return;
+    }
+    chatPanel.style.top = `${window.visualViewport.offsetTop + 8}px`;
+    chatPanel.style.height = `${Math.max(180, window.visualViewport.height - 16)}px`;
+    chatPanel.style.bottom = 'auto';
+  }
+  function setChatOpen(open, restore = true) {
+    if (open && document.querySelector('.image-lightbox.is-open')) return;
+    if (open) returnFocus = document.activeElement;
+    chatPanel.hidden = !open;
+    chatPanel.inert = !open;
+    chatLauncher.setAttribute('aria-expanded', String(open));
+    if (open) {
+      updateMobileViewport();
+      requestAnimationFrame(() => { if (!chatPanel.hidden) { chatInput.focus({preventScroll:true}); scrollToLatest(); } });
+    } else if (restore) (returnFocus?.isConnected ? returnFocus : chatLauncher).focus({preventScroll:true});
+  }
+  function resetChat() {
+    if (pending) pending.controller.abort();
+    pending = null; // Late responses belong to the old conversation and are ignored.
+    clearRetry();
+    conversationHistory = [];
+    chatMessages.replaceChildren();
     chatInput.value = '';
-    sendToAssistant(question);
+    suggestions.hidden = false;
+    status('');
+    addChatMessage('Hi! I can explain Jing Siang’s background and engineering projects using his portfolio notes. What would you like to know?', 'bot', true);
+    updateControls();
+  }
+  chatLauncher.addEventListener('click', () => setChatOpen(chatPanel.hidden));
+  document.getElementById('chatClose').addEventListener('click', () => setChatOpen(false));
+  document.getElementById('chatReset').addEventListener('click', () => { resetChat(); chatInput.focus(); });
+  document.getElementById('chatContact').addEventListener('click', () => { setChatOpen(false, false); document.querySelector('#contact a').focus({preventScroll:true}); });
+  chatStop.addEventListener('click', () => { if (pending) { pending.stopped = true; pending.controller.abort(); } });
+  chatRetry.addEventListener('click', () => { if (retryRequest && !pending) sendToAssistant(retryRequest.question, retryRequest); });
+  chatJump.addEventListener('click', scrollToLatest);
+  chatMessages.addEventListener('scroll', () => { if (isNearBottom()) chatJump.hidden = true; });
+  chatInput.addEventListener('input', updateControls);
+  chatInput.addEventListener('keydown', event => {
+    if (event.key === 'Enter' && !event.shiftKey && !event.isComposing) { event.preventDefault(); sendToAssistant(chatInput.value); }
   });
-
+  document.getElementById('chatForm').addEventListener('submit', event => { event.preventDefault(); sendToAssistant(chatInput.value); });
+  suggestions.querySelectorAll('button').forEach(button => button.addEventListener('click', () => sendToAssistant(button.dataset.question)));
   document.addEventListener('keydown', event => {
-    if(event.key === 'Escape' && chatPanel.classList.contains('is-open')) setChatOpen(false);
+    if (event.key === 'Escape' && !chatPanel.hidden && !document.querySelector('.image-lightbox.is-open')) { event.preventDefault(); setChatOpen(false); }
   });
-</script>
+  document.addEventListener('portfolio:lightbox-open', () => { if (!chatPanel.hidden) setChatOpen(false, false); });
+  window.addEventListener('resize', updateMobileViewport);
+  window.visualViewport?.addEventListener('resize', updateMobileViewport);
+  window.visualViewport?.addEventListener('scroll', updateMobileViewport);
+  resetChat();
+})();
 
+</script>
 </body>
 </html>
