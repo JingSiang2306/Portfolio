@@ -1242,11 +1242,11 @@
   }
 </script>
 
-<!-- AI assistant: api/chat.js calls OpenAI using knowledge_v2.1.js. -->
+<!-- AI assistant: api/chat.js calls OpenAI using knowledge_v2.3.js. -->
 <button class="chat-launcher" id="chatLauncher" type="button" aria-label="Open portfolio assistant" aria-expanded="false" aria-controls="portfolioChat">Ask about my work</button>
 <aside class="chat-panel" id="portfolioChat" role="dialog" aria-labelledby="chatTitle" hidden inert>
   <div class="chat-head">
-    <div><p class="chat-eyebrow">Portfolio assistant</p><h2 id="chatTitle">Ask about Jing Siang’s work</h2></div>
+    <div><p class="chat-eyebrow">Portfolio assistant</p><h2 id="chatTitle">Ask a question</h2></div>
     <div class="chat-head-actions">
       <button class="chat-reset" id="chatReset" type="button" title="Clear this conversation">New chat</button>
       <button class="chat-close" id="chatClose" type="button" aria-label="Close portfolio assistant">&times;</button>
@@ -1270,7 +1270,7 @@
       <button class="chat-stop" id="chatStop" type="button" hidden>Stop</button>
     </div>
     <div class="chat-input-meta"><span id="chatInputHint">Enter to send · Shift+Enter for a new line</span><span id="chatCount">0 / 1200</span></div>
-    <p class="chat-note">AI answers from portfolio notes may contain mistakes. <a href="#contact" id="chatContact">Contact Jing Siang</a>. Questions and recent replies are sent to OpenAI.</p>
+    <p class="chat-note">AI-generated answers may contain mistakes. <a href="#contact" id="chatContact">Contact Jing Siang</a>. Questions and recent replies are sent to OpenAI.</p>
   </form>
 </aside>
 <noscript><p class="wrap">The galleries and AI assistant need JavaScript. You can still read the portfolio and contact Jing Siang by email.</p></noscript>
@@ -1490,7 +1490,7 @@
     chatInput.value = '';
     suggestions.hidden = false;
     status('');
-    addChatMessage('Hi! I can explain Jing Siang’s background and engineering projects using his portfolio notes. What would you like to know?', 'bot', true);
+    addChatMessage('Hi! Ask me about Jing Siang’s background and projects, or a general question.', 'bot', true);
     updateControls();
   }
   chatLauncher.addEventListener('click', () => setChatOpen(chatPanel.hidden));
