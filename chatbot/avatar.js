@@ -1,12 +1,16 @@
 /* DOM adapter for jeremy-prt/bloub's MIT-licensed animation engine. */
 (() => {
   const host = document.getElementById('chatAvatar');
-  if (!host || !window.Bloub?.EXPRESSION_BY_ID) return;
+  const launcher = document.getElementById('chatLauncher');
+  if (!host || !launcher || !window.Bloub?.EXPRESSION_BY_ID) return;
 
   const { BotEngine, EXPRESSION_BY_ID } = window.Bloub;
   const neutral = EXPRESSION_BY_ID.get('neutre');
   const engine = new BotEngine(100, 'idle', null, neutral);
+  // Rest expressions are independent of a request that may continue while closed.
+  const restEngine = new BotEngine(100, 'idle', null, neutral);
   const stillEngine = new BotEngine(100, 'idle', null, neutral);
+  const neutralFrame = stillEngine.sample(0);
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
   const mobile = window.matchMedia('(max-width: 480px)');
   const ns = 'http://www.w3.org/2000/svg';
@@ -19,11 +23,14 @@
   let retrying = false;
   let clock = 0;
   let stateAt = 0;
-  let nextExpression = 5;
   let expression = 'neutre';
+  let restCycling = true;
+  let hovered = false;
+  let keyboardFocused = false;
   let last = null;
   let raf = null;
   let burstTimer = null;
+  let idleTimer = null;
 
   function attrs(node, values) {
     for (const [key, value] of Object.entries(values)) node.setAttribute(key, value);
@@ -112,33 +119,67 @@
     renderArcs(frontArcs, frame.arcs, 'front');
   }
   function displayedMode() {
-    return !open && mode !== 'idle' ? 'neutral' : mode;
+    return !open || mode === 'idle' || mode === 'neutral'
+      ? (restCycling ? 'idle' : 'neutral') : mode;
+  }
+  function resting() {
+    return ['idle', 'neutral'].includes(displayedMode());
+  }
+  function attention() {
+    return hovered || keyboardFocused;
+  }
+  function restExpression() {
+    return attention() ? 'curieux' : expression;
   }
   function paint() {
     const state = displayedMode();
+    const atRest = resting();
     host.dataset.state = state;
-    host.dataset.expression = state === 'idle' ? names[expression] : 'neutral';
-    if (state === 'neutral') {
-      render(stillEngine.sample(0));
+    host.dataset.expression = atRest ? names[restExpression()] : 'neutral';
+    if (state === 'neutral' && !attention()) {
+      render(neutralFrame);
     } else if (reduced.matches) {
       // A readable still, without blinking, random changes or looping motion.
-      stillEngine.reset(state === 'idle' ? 'idle' : state, 0);
+      stillEngine.setExpression(atRest ? EXPRESSION_BY_ID.get(restExpression()) : neutral, -1);
+      stillEngine.reset(atRest ? 'idle' : state, 0);
       render(stillEngine.sample(0.9));
-      stillEngine.reset('idle', 0);
-    } else render(engine.sample(clock));
+    } else render((atRest ? restEngine : engine).sample(clock));
+  }
+  function resetRest(cycling = false) {
+    expression = 'neutre';
+    restCycling = cycling;
+    restEngine.setExpression(EXPRESSION_BY_ID.get(restExpression()), clock);
+    restEngine.reset('idle', clock);
   }
   function setMode(value, immediate = false) {
     mode = value;
     stateAt = clock;
     const state = value === 'neutral' ? 'idle' : value;
     engine.setExpression(neutral, clock);
-    expression = 'neutre';
+    if (!open || value === 'neutral' || value === 'idle') resetRest(value === 'idle');
     if (immediate) engine.reset(state, clock);
     else engine.setState(state, clock);
     resume();
   }
   function animated() {
-    return !document.hidden && !(mobile.matches && open) && !reduced.matches && displayedMode() !== 'neutral';
+    return visible() && !reduced.matches && (displayedMode() !== 'neutral' || attention());
+  }
+  function visible() {
+    return !document.hidden && !(mobile.matches && open);
+  }
+  function scheduleIdle() {
+    clearTimeout(idleTimer);
+    idleTimer = null;
+    if (!visible() || !resting() || attention() || reduced.matches) return;
+    // Use elapsed wall time, not rendered frame count, for the five-second delay.
+    idleTimer = setTimeout(() => {
+      idleTimer = null;
+      const choices = expressions.filter(id => id !== expression);
+      expression = choices[Math.floor(Math.random() * choices.length)];
+      restCycling = true;
+      restEngine.setExpression(EXPRESSION_BY_ID.get(expression), clock);
+      resume();
+    }, 5000);
   }
   function tick(timestamp) {
     raf = null;
@@ -146,13 +187,7 @@
     if (last === null || timestamp - last >= 1000 / 30) {
       clock += last === null ? 0 : Math.min((timestamp - last) / 1000, 0.064);
       last = timestamp;
-      if (mode === 'idle' && clock >= nextExpression) {
-        const choices = expressions.filter(id => id !== expression);
-        expression = choices[Math.floor(Math.random() * choices.length)];
-        engine.setExpression(EXPRESSION_BY_ID.get(expression), clock);
-        nextExpression = clock + 5;
-      }
-      if (loops[mode] && clock - stateAt >= loops[mode]) {
+      if (!resting() && loops[mode] && clock - stateAt >= loops[mode]) {
         // Upstream clips have finite durations; restart so trails never expire.
         stateAt = clock;
         engine.reset(mode, clock);
@@ -166,6 +201,7 @@
     raf = null;
     last = null;
     paint();
+    scheduleIdle();
     if (animated()) raf = requestAnimationFrame(tick);
   }
   function cancelBurst() {
@@ -197,6 +233,7 @@
     },
     setOpen(value) {
       open = value;
+      if (!open) resetRest();
       if (pending || retrying) resume();
       else setMode('neutral', true);
     },
@@ -204,14 +241,34 @@
       cancelBurst();
       pending = false;
       retrying = false;
-      nextExpression = clock + 5;
       setMode(initial ? 'idle' : 'neutral', true);
     }
   };
+  function updateAttention() {
+    restEngine.setExpression(EXPRESSION_BY_ID.get(restExpression()), clock);
+    resume();
+  }
+  launcher.addEventListener('pointerenter', event => {
+    if (event.pointerType === 'touch') return;
+    hovered = true;
+    updateAttention();
+  });
+  launcher.addEventListener('pointerleave', () => { hovered = false; updateAttention(); });
+  launcher.addEventListener('pointercancel', () => { hovered = false; updateAttention(); });
+  launcher.addEventListener('focus', () => {
+    keyboardFocused = launcher.matches(':focus-visible');
+    updateAttention();
+  });
+  launcher.addEventListener('blur', () => { keyboardFocused = false; updateAttention(); });
   document.addEventListener('visibilitychange', resume);
   reduced.addEventListener('change', resume);
   mobile.addEventListener('change', resume);
-  window.addEventListener('pagehide', () => { if (raf !== null) cancelAnimationFrame(raf); raf = null; });
+  window.addEventListener('pagehide', () => {
+    if (raf !== null) cancelAnimationFrame(raf);
+    raf = null;
+    clearTimeout(idleTimer);
+    idleTimer = null;
+  });
   window.addEventListener('pageshow', resume);
   host.replaceChildren(svg);
   resume();

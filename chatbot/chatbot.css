@@ -1,4 +1,4 @@
-B/* Chatbot styles. Shared design tokens and accessibility rules are in ../style.css. */
+/* Chatbot styles. Shared design tokens and accessibility rules are in ../style.css. */
 
   html[data-theme="light"] .chat-send,
   html[data-theme="light"] .chat-stop,
@@ -6,12 +6,16 @@ B/* Chatbot styles. Shared design tokens and accessibility rules are in ../style
 
   .chat-launcher{
     position:fixed; right:24px; bottom:max(24px, env(safe-area-inset-bottom)); z-index:200;
-    width:76px; height:76px; padding:0; border-radius:50%; border:1px solid var(--line-blue);
+    width:76px; height:76px; padding:0; border-radius:50%; border:0;
     display:grid; place-items:center;
-    background:#f9f9f9; color:#0a0a0c; font:600 14px 'Inter',sans-serif; cursor:pointer;
+    background:transparent; color:#fff; font:600 14px 'Inter',sans-serif; cursor:pointer;
+    /* Outer white circle: uncomment this block's declarations to restore it.
+    background:#f9f9f9;
+    border:1px solid var(--line-blue);
     box-shadow:0 8px 24px rgba(0,0,0,.25);
+    */
   }
-  .chat-launcher:hover{ border-color:var(--copper); }
+  html[data-theme="light"] .chat-launcher{ color:#000; }
   .chat-avatar{ display:block; width:100%; height:100%; pointer-events:none; }
   .chat-avatar svg{ display:block; width:100%; height:100%; }
   .chat-launcher-label{
@@ -107,7 +111,7 @@ B/* Chatbot styles. Shared design tokens and accessibility rules are in ../style
   }
   @media (hover:hover) and (pointer:fine) and (prefers-reduced-motion:no-preference){
     .chat-launcher:hover{
-      transform:translateY(-2px); box-shadow:0 8px 22px rgba(0,0,0,.18);
+      transform:translateY(-2px);
     }
     .chat-launcher:active{ transform:translateY(0); }
   }
