@@ -190,7 +190,8 @@
     padding:13px 24px; border-radius:var(--radius);
     text-decoration:none; display:inline-flex; align-items:center; gap:8px;
     letter-spacing:.02em; cursor:pointer; border:1px solid transparent;
-    transition:all .2s;
+    transition:background .2s ease, border-color .2s ease, color .2s ease,
+      transform .2s ease, box-shadow .2s ease;
   }
   .btn-primary{ background:var(--copper); color:#12100D; font-weight:600; }
   .btn-primary:hover{ background:#ffa066; }
@@ -339,14 +340,6 @@
   .contact-links a:hover{ color:var(--teal); }
   .fine-print{ margin-top:60px; display:flex; justify-content:space-between; color:var(--paper-dim); font-family:'JetBrains Mono', monospace; font-size:12px; flex-wrap:wrap; gap:10px; }
 
-  /* reveal-on-scroll */
-  .reveal{ opacity:0; transform:translateY(16px); transition:opacity .6s ease, transform .6s ease; }
-  .reveal.in{ opacity:1; transform:none; }
-  @media (prefers-reduced-motion: reduce){
-    .reveal{ opacity:1; transform:none; transition:none; }
-    html{ scroll-behavior:auto; }
-  }
-
   /* ---------- AI CHAT WIDGET ---------- */
   [hidden]{ display:none !important; }
   :focus-visible{ outline:2px solid var(--teal); outline-offset:3px; }
@@ -423,7 +416,6 @@
   .gallery-arrow{ color:#E7EEF6; }
   .project-body p{ text-align:left; }
   .theme-toggle,.nav-toggle{ min-width:44px; min-height:44px; }
-  .reveal{ opacity:1; transform:none; }
   @media (max-width:480px){
     .chat-launcher{ right:16px; bottom:max(16px, env(safe-area-inset-bottom)); }
     .chat-panel{ right:8px; left:8px; width:auto; max-width:none; bottom:max(8px, env(safe-area-inset-bottom)); height:calc(100vh - 16px); height:calc(100dvh - 16px); }
@@ -437,6 +429,44 @@
   .chat-panel.is-compact .chat-suggestions{ display:none; }
   .chat-panel.is-compact .chat-input{ height:44px; }
   .chat-panel.is-compact .chat-head{ padding:8px 12px; }
+
+  /* Motion is progressive enhancement: page content stays visible by default. */
+  .navlinks a{ position:relative; display:inline-block; }
+  .navlinks a::after{
+    content:''; position:absolute; left:0; right:0; bottom:-5px; height:1px;
+    background:var(--teal); transform:scaleX(0); transform-origin:left;
+    transition:transform .2s ease;
+  }
+  .navlinks a:focus-visible::after{ transform:scaleX(1); }
+  .project-card,.skill-panel,.edu-card{
+    transition:background .25s ease, border-color .25s ease, color .25s ease,
+      box-shadow .25s ease;
+  }
+  .chat-launcher{
+    transition:background .2s ease, border-color .2s ease, color .2s ease,
+      transform .2s ease, box-shadow .2s ease;
+  }
+  @media (hover:hover) and (pointer:fine){
+    .navlinks a:hover::after{ transform:scaleX(1); }
+    .project-card:hover,.skill-panel:hover,.edu-card:hover{
+      border-color:var(--teal); box-shadow:0 10px 28px rgba(0,0,0,.12);
+    }
+  }
+  @media (prefers-reduced-motion:no-preference){
+    @keyframes gallery-enter{ from{ opacity:0; } to{ opacity:1; } }
+    @keyframes chat-enter{
+      from{ opacity:0; transform:translateY(8px); }
+      to{ opacity:1; transform:none; }
+    }
+    .gallery-slide.is-active{ animation:gallery-enter .22s ease-out; }
+    .chat-panel:not([hidden]){ animation:chat-enter .18s ease-out; }
+  }
+  @media (hover:hover) and (pointer:fine) and (prefers-reduced-motion:no-preference){
+    .btn:hover,.chat-launcher:hover{
+      transform:translateY(-2px); box-shadow:0 8px 22px rgba(0,0,0,.18);
+    }
+    .btn:active,.chat-launcher:active{ transform:translateY(0); }
+  }
   @media (prefers-reduced-motion:reduce){
     *,*::before,*::after{ scroll-behavior:auto !important; animation:none !important; transition:none !important; }
   }
@@ -488,7 +518,7 @@
       <div class="cta-row">
         <a href="#projects" class="btn btn-primary">View Projects →</a>
         <a href="mailto:2306cjs@gmail.com" class="btn btn-ghost">Get in Touch</a>
-        <a href="Knowledge/Resume.pdf" class="btn btn-ghost" target="_blank" rel="noopener noreferrer">Download Resume</a>
+        <a href="Resume.pdf" class="btn btn-ghost" target="_blank" rel="noopener noreferrer">Download Resume</a>
       </div>
 
       <div class="hero-meta">
@@ -502,7 +532,7 @@
 </section>
 
 <!-- ---------------- ABOUT ---------------- -->
-<section id="about" class="wrap reveal">
+<section id="about" class="wrap">
   <br>
   <div class="sec-head"><span class="sec-num">01 /</span><h2>About</h2><div class="sec-line"></div></div>
   <div class="about-grid">
@@ -542,7 +572,7 @@
 </section>
 
 <!-- ---------------- PROJECTS (main focus) ---------------- -->
-<section id="projects" class="wrap reveal">
+<section id="projects" class="wrap">
   <br>
   <div class="sec-head"><span class="sec-num">02 /</span><h2>Featured Projects</h2><div class="sec-line"></div></div>
 
@@ -907,7 +937,7 @@
   </div>
 
 <!-- ---------------- EXPERIENCE ---------------- -->
-<section id="experience" class="wrap reveal">
+<section id="experience" class="wrap">
   <div class="sec-head"><span class="sec-num">03 /</span><h2>Experience</h2><div class="sec-line"></div></div>
   <div class="timeline">
     <div class="t-item">
@@ -934,7 +964,7 @@
 </section>
 
 <!-- ---------------- EDUCATION ---------------- -->
-<section id="education" class="wrap reveal">
+<section id="education" class="wrap">
   <br>
   <div class="sec-head"><span class="sec-num">04 /</span><h2>Education</h2><div class="sec-line"></div></div>
   <div class="edu-grid">
@@ -960,7 +990,7 @@
 
 <!-- ---------------- CONTACT ---------------- -->
 </main>
-<footer id="contact" class="wrap reveal">
+<footer id="contact" class="wrap">
   <div class="contact-inner">
     <br>
     <h2>Let's build something. <span style="color:var(--copper)">Get in touch.</span></h2>
@@ -1517,6 +1547,100 @@
   resetChat();
 })();
 
+</script>
+<script>
+// Reveal once per page load. No persistent hidden styles or scroll listeners.
+(() => {
+  'use strict';
+  if (typeof window.IntersectionObserver !== 'function' ||
+      typeof Element.prototype.animate !== 'function' ||
+      typeof window.matchMedia !== 'function') return;
+
+  const motionPreference = window.matchMedia('(prefers-reduced-motion: reduce)');
+  if (motionPreference.matches) return;
+
+  const targets = Array.from(document.querySelectorAll([
+    '.hero-inner > .eyebrow', '.hero-inner > h1', '.hero-inner > .role',
+    '.hero-inner > .summary', '.hero-inner > .cta-row', '.hero-inner > .hero-meta',
+    '.sec-head', '.about-grid > div', '.project-card', '.t-item',
+    '.edu-card', '.contact-inner', '.fine-print'
+  ].join(',')));
+  const pending = new Set(targets);
+  const active = new Map();
+  const delays = new Map();
+  let observer;
+  let stopped = false;
+
+  // Small stagger for the introduction and adjacent cards; no long waits.
+  document.querySelectorAll('.hero-inner, .about-grid, .edu-grid').forEach(group => {
+    Array.from(group.children).filter(child => pending.has(child)).forEach((child, index) => {
+      delays.set(child, Math.min(index * 50, 250));
+    });
+  });
+
+  function stopMotion() {
+    stopped = true;
+    observer?.disconnect();
+    pending.clear();
+    active.forEach(animation => animation.cancel());
+    active.clear();
+  }
+
+  function reveal(target) {
+    if (stopped || !pending.delete(target)) return;
+    observer.unobserve(target);
+    // A keyboard user should never wait for a focused control to appear.
+    if (target.contains(document.activeElement) || motionPreference.matches) return;
+    try {
+      const animation = target.animate([
+        { opacity:0, transform:'translateY(18px)' },
+        { opacity:1, transform:'translateY(0)' }
+      ], {
+        duration:560,
+        delay:delays.get(target) || 0,
+        easing:'cubic-bezier(.22, 1, .36, 1)',
+        fill:'backwards'
+      });
+      active.set(target, animation);
+      animation.onfinish = animation.oncancel = () => active.delete(target);
+    } catch {
+      // If animation is unavailable, the element retains its visible base style.
+    }
+  }
+
+  try {
+    observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => { if (entry.isIntersecting) reveal(entry.target); });
+      if (!pending.size) observer.disconnect();
+    }, { threshold:0, rootMargin:'0px 0px -24px 0px' });
+    targets.forEach(target => observer.observe(target));
+
+    document.addEventListener('focusin', event => {
+      pending.forEach(target => {
+        if (target.contains(event.target)) {
+          pending.delete(target);
+          observer.unobserve(target);
+        }
+      });
+      active.forEach((animation, target) => {
+        if (target.contains(event.target)) {
+          animation.cancel();
+          active.delete(target);
+        }
+      });
+      if (!pending.size) observer.disconnect();
+    });
+    const onPreferenceChange = event => { if (event.matches) stopMotion(); };
+    if (motionPreference.addEventListener) {
+      motionPreference.addEventListener('change', onPreferenceChange);
+    } else if (motionPreference.addListener) {
+      motionPreference.addListener(onPreferenceChange);
+    }
+    window.addEventListener('beforeprint', stopMotion);
+  } catch {
+    stopMotion();
+  }
+})();
 </script>
 </body>
 </html>
