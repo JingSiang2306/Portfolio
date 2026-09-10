@@ -39,7 +39,6 @@
     chatStop.hidden = !pending;
     chatWaiting.hidden = !pending;
     suggestions.querySelectorAll('button').forEach(button => { button.disabled = !!pending; });
-    window.portfolioAvatar?.setThinking(!!pending);
   }
   // Inline emphasis is parsed into text nodes; model output never becomes HTML.
   function appendInline(parent, text) {
@@ -125,6 +124,7 @@
     chatRetry.hidden = false;
     chatRetry.disabled = delay > 0;
     chatRetry.textContent = delay > 0 ? `Retry in ${delay}s` : 'Retry question';
+    window.portfolioAvatar?.requestFailed(true);
     if (delay > 0) retryTimer = setTimeout(() => {
       chatRetry.disabled = false;
       chatRetry.textContent = 'Retry question';
@@ -145,6 +145,7 @@
     const history = (retry?.history || conversationHistory).slice(-6);
     const request = { question, history, controller: new AbortController(), stopped: false, timedOut: false };
     pending = request;
+    window.portfolioAvatar?.requestStarted({ first: history.length === 0, retry: !!retry });
     if (!retry) {
       addChatMessage(question, 'user', true);
       chatInput.value = '';
@@ -170,10 +171,12 @@
         status(message, true);
         const delay = Math.min(60, Math.max(0, Math.ceil(Number(response.headers.get('Retry-After')) || 0)));
         if (data?.retryable !== false && response.status !== 404 && response.status !== 405) showRetry({ question, history }, delay);
+        else window.portfolioAvatar?.requestFailed(false);
         return;
       }
       if (!usableAnswer(data)) throw new Error('INVALID_REPLY');
       addChatMessage(data, 'bot');
+      window.portfolioAvatar?.requestSucceeded();
       conversationHistory = [...history, { role:'user', content:question }, { role:'assistant', content:data.reply.slice(0, MAX_HISTORY_ITEM) }].slice(-6);
       status('');
     } catch (err) {
@@ -212,10 +215,11 @@
       requestAnimationFrame(() => { if (!chatPanel.hidden) { chatInput.focus({preventScroll:true}); scrollToLatest(); } });
     } else if (restore) (returnFocus?.isConnected ? returnFocus : chatLauncher).focus({preventScroll:true});
   }
-  function resetChat() {
+  function resetChat(initial = false) {
     if (pending) pending.controller.abort();
     pending = null; // Late responses belong to the old conversation and are ignored.
     clearRetry();
+    window.portfolioAvatar?.reset(initial);
     conversationHistory = [];
     chatMessages.replaceChildren();
     chatInput.value = '';
@@ -245,5 +249,5 @@
   window.addEventListener('resize', updateMobileViewport);
   window.visualViewport?.addEventListener('resize', updateMobileViewport);
   window.visualViewport?.addEventListener('scroll', updateMobileViewport);
-  resetChat();
+  resetChat(true);
 })();
