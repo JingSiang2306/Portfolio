@@ -94,7 +94,7 @@ async def main():
         async def hover_during(expected):
             await page.locator('#chatLauncher').hover()
             await state(expected)
-            assert await expression() != 'curious', f'Hover replaced {expected}'
+            assert await expression() != 'confused', f'Hover replaced {expected}'
             await no_circle()
             await page.mouse.move(5, 5)
             await state(expected)
@@ -141,18 +141,16 @@ async def main():
         await body_color('rgb(255, 255, 255)')
         await no_circle()
 
-        if idle_expression == 'curious':
-            idle_expression = await next_expression(idle_expression)
         await page.wait_for_timeout(700)
         idle_eyes = await eyes()
         await page.locator('#chatLauncher').hover()
-        await page.wait_for_function('document.querySelector("#chatAvatar").dataset.expression === "curious"')
+        await page.wait_for_function('document.querySelector("#chatAvatar").dataset.expression === "confused"')
         await page.wait_for_timeout(700)
         assert await eyes() != idle_eyes, 'Hover did not visibly change the expression'
         await no_circle()
-        await screenshot('dark-hover-curious')
+        await screenshot('dark-hover-confused')
         await page.wait_for_timeout(5100)
-        assert await expression() == 'curious', 'Idle timer replaced the hover expression'
+        assert await expression() == 'confused', 'Idle timer replaced the hover expression'
         await page.mouse.move(5, 5)
         assert await expression() == idle_expression, 'Pointer leave did not restore the idle expression'
         await page.wait_for_timeout(700)
@@ -166,9 +164,9 @@ async def main():
         await page.keyboard.press('Shift+Tab')
         await page.keyboard.press('Tab')
         assert await page.locator('#chatLauncher').evaluate('(node) => node.matches(":focus-visible")')
-        await page.wait_for_function('document.querySelector("#chatAvatar").dataset.expression === "curious"')
+        await page.wait_for_function('document.querySelector("#chatAvatar").dataset.expression === "confused"')
         await page.wait_for_timeout(700)
-        await screenshot('keyboard-curious')
+        await screenshot('keyboard-confused')
         await page.mouse.click(5, 400)
 
         await open_chat()
@@ -187,17 +185,45 @@ async def main():
         assert await page.locator('#chatAvatar linearGradient').count() > 0, 'Comet trails expired instead of looping'
         reply(request)
         await state('orbit')
+        orbit_started = await page.evaluate('performance.now()')
         await hover_during('orbit')
         await page.wait_for_timeout(1000)
         assert await page.locator('#chatAvatar linearGradient').count() > 0
         await screenshot('orbit')
-        await page.wait_for_timeout(3700)
-        assert await page.locator('#chatAvatar linearGradient').count() > 0, 'Orbit stopped after the first clip'
         await page.locator('#themeToggle').click()
         await body_color('rgb(0, 0, 0)')
         await screenshot('light-orbit')
+        await state('unimpressed')
+        orbit_elapsed = await page.evaluate('performance.now()') - orbit_started
+        assert 3000 <= orbit_elapsed < 4400, f'Orbit duration was {orbit_elapsed}ms'
+        assert await expression() == 'unimpressed'
+        await page.wait_for_timeout(700)
+        unimpressed_eyes = await eyes()
+        await screenshot('light-unimpressed')
+        await page.wait_for_timeout(5100)
+        assert await expression() == 'unimpressed', 'Idle timer replaced the post-reply expression'
+        await page.locator('#chatLauncher').hover()
+        await page.wait_for_function('document.querySelector("#chatAvatar").dataset.expression === "confused"')
+        await page.wait_for_timeout(700)
+        assert await eyes() != unimpressed_eyes, 'Hover did not change the post-reply expression'
+        await page.mouse.move(5, 5)
+        await state('unimpressed')
+        assert await expression() == 'unimpressed', 'Pointer leave did not restore Unimpressed'
+        await page.wait_for_timeout(700)
+        assert await eyes() == unimpressed_eyes
+        await page.locator('#chatLauncher').focus()
+        await page.keyboard.press('Shift+Tab')
+        await page.keyboard.press('Tab')
+        assert await page.locator('#chatLauncher').evaluate('(node) => node.matches(":focus-visible")')
+        await page.wait_for_function('document.querySelector("#chatAvatar").dataset.expression === "confused"')
+        await page.mouse.click(5, 400)
+        await state('unimpressed')
+        assert await expression() == 'unimpressed', 'Blur did not restore Unimpressed'
 
         request = await send('Next query')
+        await state('burst')
+        await page.wait_for_timeout(650)
+        await state('burst')
         await state('comet')
         request.set_result({'status': 503, 'json': {'error': 'Please retry.', 'retryable': True}})
         await page.locator('#chatRetry').wait_for(state='visible')
@@ -213,14 +239,16 @@ async def main():
         assert await page.locator('#chatAvatar svg > g > path').count() > 0, 'Alert dot is missing'
         reply(request)
         await state('orbit')
+        await state('unimpressed')
+        assert await expression() == 'unimpressed', 'Successful retry did not finish at Unimpressed'
 
         await page.locator('#chatClose').click()
-        assert await expression() == 'neutral', 'Pointer-restored focus incorrectly activated Curious'
+        assert await expression() == 'neutral', 'Pointer-restored focus incorrectly activated Confused'
         assert not await page.locator('#chatLauncher').evaluate('(node) => node.matches(":focus-visible")')
         await frozen()
         await next_expression('neutral')
         await page.locator('#chatLauncher').hover()
-        await page.wait_for_function('document.querySelector("#chatAvatar").dataset.expression === "curious"')
+        await page.wait_for_function('document.querySelector("#chatAvatar").dataset.expression === "confused"')
         await open_chat()
         await page.locator('#chatReset').click()
         assert await expression() == 'neutral'
@@ -249,8 +277,33 @@ async def main():
         await page.wait_for_timeout(1200)
         await state('orbit')
 
+        # Starting another query cancels the previous Orbit completion timer.
+        request = await send('New query during orbit')
+        await state('burst')
+        await page.wait_for_timeout(650)
+        await state('burst')
+        await state('comet')
+        await page.wait_for_timeout(2800)
+        await state('comet')
+        assert await expression() != 'unimpressed', 'Old Orbit timer replaced the new request'
+        reply(request)
+        await state('orbit')
+        await page.locator('#chatClose').click()
+        await page.wait_for_timeout(3600)
+        assert await expression() == 'neutral', 'Old Orbit timer replaced Neutral after close'
+        await open_chat()
+
+        request = await send('Reset during orbit')
+        await state('burst')
+        reply(request)
+        await state('orbit')
+        await page.locator('#chatReset').click()
+        await page.wait_for_timeout(3600)
+        assert await expression() == 'neutral', 'Old Orbit timer replaced Neutral after reset'
+
         # A response arriving after close must not reactivate the avatar.
         request = await send('Close while pending')
+        await state('burst')
         await page.locator('#chatClose').click()
         assert await expression() == 'neutral'
         reply(request)
@@ -260,12 +313,16 @@ async def main():
 
         # Still poses retain state feedback, including a mid-flight preference change.
         request = await send('Reduced motion')
+        await state('burst')
         await state('comet')
         await page.emulate_media(reduced_motion='reduce')
         await page.wait_for_timeout(150)
         await frozen()
         reply(request)
         await state('orbit')
+        await frozen()
+        await state('unimpressed')
+        assert await expression() == 'unimpressed'
         await frozen()
         await page.locator('#chatClose').click()
         await frozen()
@@ -280,7 +337,7 @@ async def main():
         assert await page.evaluate('document.documentElement.scrollWidth <= innerWidth')
         assert not errors, errors
         await browser.close()
-        print(json.dumps({'result': 'PASS', 'screenshots': str(output), 'checks': 'real theme toggle and SVG fills, no outer circle at rest/hover, visible random idle changes and five-second timing, hover/focus Curious and animation priority, idle resumes after close/reset, Burst/Comet/Orbit loops, retry/Alert, close/reset/stop, late and fast replies, reduced motion, mobile, no page errors'}))
+        print(json.dumps({'result': 'PASS', 'screenshots': str(output), 'checks': 'real theme toggle and SVG fills, no outer circle at rest/hover, visible random idle changes and five-second timing, hover/focus Confused and animation priority, idle resumes after close/reset, every query Burst then looping Comet, one-shot Orbit then persistent Unimpressed with hover/focus, retry/Alert then Orbit/Unimpressed, Orbit timer cancellation on new query/close/reset, close/reset/stop, late and fast replies, reduced motion, mobile, no page errors'}))
 
 
 asyncio.run(main())

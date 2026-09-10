@@ -15,8 +15,11 @@
   const mobile = window.matchMedia('(max-width: 480px)');
   const ns = 'http://www.w3.org/2000/svg';
   const expressions = ['neutre', 'curieux', 'heureux', 'somnolent'];
-  const names = { neutre: 'neutral', curieux: 'curious', heureux: 'happy', somnolent: 'sleepy' };
-  const loops = { comet: 2.4, orbit: 3.4, alert: 2.4 };
+  // Hover / keyboard focus: confus = confused, curieux = curious, heureux = happy.
+  const HOVER_EXPRESSION = 'confus';
+  const names = { neutre: 'neutral', curieux: 'curious', heureux: 'happy', somnolent: 'sleepy', confus: 'confused', blase: 'unimpressed' };
+  const loops = { comet: 2.4, alert: 2.4 };
+  const ORBIT_DURATION = 3400;
   let mode = 'idle';
   let open = false;
   let pending = false;
@@ -30,6 +33,7 @@
   let last = null;
   let raf = null;
   let burstTimer = null;
+  let orbitTimer = null;
   let idleTimer = null;
 
   function attrs(node, values) {
@@ -123,13 +127,13 @@
       ? (restCycling ? 'idle' : 'neutral') : mode;
   }
   function resting() {
-    return ['idle', 'neutral'].includes(displayedMode());
+    return ['idle', 'neutral', 'unimpressed'].includes(displayedMode());
   }
   function attention() {
     return hovered || keyboardFocused;
   }
   function restExpression() {
-    return attention() ? 'curieux' : expression;
+    return attention() ? HOVER_EXPRESSION : expression;
   }
   function paint() {
     const state = displayedMode();
@@ -152,14 +156,27 @@
     restEngine.reset('idle', clock);
   }
   function setMode(value, immediate = false) {
+    clearTimeout(orbitTimer);
+    orbitTimer = null;
     mode = value;
     stateAt = clock;
-    const state = value === 'neutral' ? 'idle' : value;
+    const state = value === 'neutral' || value === 'unimpressed' ? 'idle' : value;
     engine.setExpression(neutral, clock);
     if (!open || value === 'neutral' || value === 'idle') resetRest(value === 'idle');
+    if (value === 'unimpressed') {
+      expression = 'blase';
+      restEngine.setExpression(EXPRESSION_BY_ID.get(restExpression()), clock);
+    }
     if (immediate) engine.reset(state, clock);
     else engine.setState(state, clock);
     resume();
+    if (value === 'orbit') {
+      // One completion timer also works when reduced motion or mobile hides playback.
+      orbitTimer = setTimeout(() => {
+        orbitTimer = null;
+        if (mode === 'orbit' && open) setMode('unimpressed');
+      }, ORBIT_DURATION);
+    }
   }
   function animated() {
     return visible() && !reduced.matches && (displayedMode() !== 'neutral' || attention());
@@ -170,7 +187,7 @@
   function scheduleIdle() {
     clearTimeout(idleTimer);
     idleTimer = null;
-    if (!visible() || !resting() || attention() || reduced.matches) return;
+    if (!visible() || !resting() || displayedMode() === 'unimpressed' || attention() || reduced.matches) return;
     // Use elapsed wall time, not rendered frame count, for the five-second delay.
     idleTimer = setTimeout(() => {
       idleTimer = null;
@@ -209,11 +226,11 @@
     burstTimer = null;
   }
   window.portfolioAvatar = {
-    requestStarted({ first, retry }) {
+    requestStarted({ retry }) {
       cancelBurst();
       pending = true;
       retrying = retry || retrying;
-      setMode(retrying ? 'alert' : first ? 'burst' : 'comet');
+      setMode(retrying ? 'alert' : 'burst');
       if (mode === 'burst') burstTimer = setTimeout(() => {
         burstTimer = null;
         if (pending && mode === 'burst') setMode('comet');

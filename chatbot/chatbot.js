@@ -145,7 +145,7 @@
     const history = (retry?.history || conversationHistory).slice(-6);
     const request = { question, history, controller: new AbortController(), stopped: false, timedOut: false };
     pending = request;
-    window.portfolioAvatar?.requestStarted({ first: history.length === 0, retry: !!retry });
+    window.portfolioAvatar?.requestStarted({ retry: !!retry });
     if (!retry) {
       addChatMessage(question, 'user', true);
       chatInput.value = '';

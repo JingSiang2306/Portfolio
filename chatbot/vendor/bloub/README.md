@@ -14,17 +14,26 @@ commented out in `../../chatbot.css`.
 
 While idle, expressions change randomly every five seconds among neutral,
 curious, happy and sleepy, without consecutive repeats. Hovering or focusing the
-launcher with the keyboard shows Curious; leaving restores the previous idle
+launcher with the keyboard shows Confused; leaving restores the previous idle
 expression and starts a fresh five-second delay. Hover never interrupts request,
 reply or retry animations. Opening, closing or resetting the chat returns to
-Neutral immediately, then resumes idle expressions after five seconds. The first query in a
-new conversation starts Burst for one second, then loops Comet until the response.
-Later queries start Comet directly. A successful reply loops Orbit while open.
+Neutral immediately, then resumes idle expressions after five seconds. Every
+regular query starts Burst for one second, then loops Comet until the response.
+A successful reply plays Orbit once (3.4 seconds), then holds the Unimpressed
+expression (`blase`) while the chat remains open. Hover/focus temporarily shows
+Confused and returns to Unimpressed on leaving; random idle cycling stays paused.
 If a reply arrives before the second is up, Orbit starts immediately.
-Whenever Retry appears, Alert loops through the retry request until success.
+Whenever Retry appears, Alert loops through the retry request until success,
+then follows the same Orbit-to-Unimpressed sequence. A new query, closing or
+resetting the chat cancels any previous Orbit completion timer.
 Closing returns to Neutral and resumes idle cycling; pending/retry activity resumes on reopen.
 New chat cancels previous animation timers. Reduced motion uses still poses;
 rendering pauses in hidden tabs or behind the full-screen mobile chat panel.
+
+To change the hover/focus expression, edit `HOVER_EXPRESSION` near the top of
+`../../avatar.js`. Bloub uses French preset IDs: `confus` (confused), `curieux`
+(curious), `heureux` (happy), `somnolent` (sleepy), and `neutre` (neutral).
+The separate `expressions` array controls the random idle expressions.
 
 The bundle is committed and served locally. No clone, npm install, Vue runtime,
 CDN, or build step is needed to run the portfolio.
