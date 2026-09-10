@@ -39,6 +39,7 @@
     chatStop.hidden = !pending;
     chatWaiting.hidden = !pending;
     suggestions.querySelectorAll('button').forEach(button => { button.disabled = !!pending; });
+    window.portfolioAvatar?.setThinking(!!pending);
   }
   // Inline emphasis is parsed into text nodes; model output never becomes HTML.
   function appendInline(parent, text) {
@@ -204,6 +205,8 @@
     chatPanel.hidden = !open;
     chatPanel.inert = !open;
     chatLauncher.setAttribute('aria-expanded', String(open));
+    chatLauncher.setAttribute('aria-label', open ? 'Close portfolio assistant' : 'Open portfolio assistant');
+    window.portfolioAvatar?.setOpen(open);
     if (open) {
       updateMobileViewport();
       requestAnimationFrame(() => { if (!chatPanel.hidden) { chatInput.focus({preventScroll:true}); scrollToLatest(); } });
@@ -244,4 +247,3 @@
   window.visualViewport?.addEventListener('scroll', updateMobileViewport);
   resetChat();
 })();
-

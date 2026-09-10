@@ -571,7 +571,12 @@
 
 
 <!-- AI assistant: api/chat.js calls OpenAI using knowledge_v2.3.js. -->
-<button class="chat-launcher" id="chatLauncher" type="button" aria-label="Open portfolio assistant" aria-expanded="false" aria-controls="portfolioChat">Ask about my work</button>
+<button class="chat-launcher" id="chatLauncher" type="button" aria-label="Open portfolio assistant" aria-expanded="false" aria-controls="portfolioChat">
+  <span class="chat-avatar" id="chatAvatar" aria-hidden="true">
+    <svg viewBox="-130 -130 260 260" focusable="false"><circle r="100" fill="#0a0a0c"/><g fill="#fff" transform="rotate(-26)"><rect x="-42" y="-32" width="23" height="58" rx="12"/><rect x="13" y="-32" width="23" height="58" rx="12"/></g></svg>
+  </span>
+  <span class="chat-launcher-label" aria-hidden="true">Ask about my work</span>
+</button>
 <aside class="chat-panel" id="portfolioChat" role="dialog" aria-labelledby="chatTitle" hidden inert>
   <div class="chat-head">
     <div><p class="chat-eyebrow">Portfolio assistant</p><h2 id="chatTitle">Ask a question</h2></div>
@@ -610,6 +615,8 @@
 
 <!-- Load in order: shared portfolio helpers, chatbot, then scroll effects. -->
 <script src="script.js"></script>
+<script src="chatbot/vendor/bloub/bloub.js"></script>
+<script src="chatbot/avatar.js"></script>
 <script src="chatbot/chatbot.js"></script>
 <script src="js/scroll.js"></script>
 </body>
