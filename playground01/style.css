@@ -47,6 +47,16 @@ h2{font-size:21px}
 .dropzone>span{color:var(--paper-dim);font-size:13px}
 .browse-text{color:var(--copper);border-bottom:1px solid var(--copper)}
 .dropzone small{color:var(--paper-dim);font-size:11px;margin-top:8px}
+.option-title{font-size:16px;line-height:1.4;margin-bottom:12px}
+.option-divider{display:flex;align-items:center;gap:16px;margin:18px 0;color:var(--paper-dim);font:11px 'JetBrains Mono',monospace}
+.option-divider:before,.option-divider:after{content:'';height:1px;flex:1;background:var(--line-blue-soft)}
+.example-section{padding:20px;border:1px solid var(--line-blue-soft);background:var(--navy-panel)}
+.example-section>p{font-size:12px;color:var(--paper-dim)}
+.example-section label{display:block;margin:14px 0 7px;font:11px 'JetBrains Mono',monospace;color:var(--teal)}
+.example-section select{width:100%;min-height:44px;padding:10px 12px;background:var(--navy-deep);color:var(--paper);border:1px solid var(--line-blue);border-radius:2px;font:14px 'Inter',sans-serif;cursor:pointer}
+.example-section select:focus-visible{outline:2px solid var(--teal);outline-offset:3px}
+.example-section select:disabled{opacity:.5;cursor:not-allowed}
+#exampleStatus{margin-top:8px}
 .selection-row{font-size:11px;margin-top:12px;flex-wrap:wrap;color:var(--paper-dim)}
 #fileName{overflow-wrap:anywhere;min-width:0}
 .action-row{margin:22px 0 0;flex-wrap:wrap}

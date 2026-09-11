@@ -5,4 +5,5 @@ and AI-based systems. Experienced in developing AI classification projects using
 3D printing, Python, C, and MATLAB. Strong problem-solving and teamwork skills, with an interest in automation, software development, and 
 practical engineering solutions.
 </p>
-Portfolio: portfolio-roan-two-dgaup27j2e.vercel.app
+
+Portfolio: https://portfolio-roan-two-dgaup27j2e.vercel.app/

@@ -1,0 +1,6 @@
+[
+  { "name": "Elephants", "file": "elephant1.jpg" },
+  { "name": "Humans", "file": "human1.jpg" },
+  { "name": "Human + Elephants", "file": "human&elephant1.webp" },
+  { "name": "Human + Car", "file": "human&car1.jpg" }
+]

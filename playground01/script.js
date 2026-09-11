@@ -2,6 +2,7 @@
 
 // Model configuration. Names come from this best.onnx file's export metadata.
 const CONFIDENCE_THRESHOLD = 0.25;
+const DEBUG_DETECTIONS = true; // Show raw, filtered and annotated rows in DevTools.
 const CLASS_NAMES = ['Car', 'Cow', 'Elephant', 'Human', 'Motorbike', 'Sheep'];
 const ELEPHANT_CLASS_ID = 2;
 const MODEL_URL = './weights/best.onnx';
@@ -18,7 +19,7 @@ const ui = Object.fromEntries([
   'selectionInfo', 'fileName', 'imageDimensions', 'runButton', 'resetButton',
   'detectionStatus', 'comparison', 'originalImage', 'resultCanvas',
   'resultPlaceholder', 'resultSummary', 'detectionCount', 'detectionList',
-  'emptyResult', 'inferenceTime', 'thresholdNote'
+  'emptyResult', 'inferenceTime', 'thresholdNote', 'exampleSelect', 'exampleStatus'
 ].map(id => [id, document.getElementById(id)]));
 
 let session = null;
@@ -31,6 +32,7 @@ let imageVersion = 0;
 let decoding = false;
 let running = false;
 let dragDepth = 0;
+let examples = [];
 
 function applyTheme(theme) {
   document.documentElement.toggleAttribute('data-theme', theme === 'light');
@@ -44,8 +46,9 @@ function updateControls() {
   ui.runButton.textContent = running ? 'Running detection...' : 'Run Detection';
   ui.dropzone.disabled = running;
   ui.imageInput.disabled = running;
-  ui.resetButton.disabled = running || decoding;
-  ui.resetButton.hidden = !selectedImage;
+  ui.exampleSelect.disabled = running || !examples.length;
+  ui.resetButton.disabled = running;
+  ui.resetButton.hidden = !selectedImage && !decoding;
   ui.comparison.setAttribute('aria-busy', String(running));
 }
 function setModelStatus(text, state) {
@@ -138,9 +141,66 @@ function validateImage(file) {
   if (file.size > MAX_FILE_BYTES) throw new Error('This image exceeds 10 MB. Please choose a smaller file.');
   if (!file.size) throw new Error('This image is empty or unreadable. Please choose another image.');
 }
-async function loadImageFile(file) {
+async function loadExamples() {
+  try {
+    const response = await fetch('./test/images.json');
+    if (!response.ok) throw new Error(`Example manifest: HTTP ${response.status}`);
+    const manifest = await response.json();
+    if (!Array.isArray(manifest) || !manifest.every(item =>
+      item && typeof item.name === 'string' && item.name.trim() &&
+      typeof item.file === 'string' && /^[^/\\]+\.(jpe?g|png|webp)$/i.test(item.file))) {
+      throw new Error('Invalid example manifest. Expected an array of { name, file } entries.');
+    }
+    examples = manifest;
+    examples.forEach((example, index) => {
+      ui.exampleSelect.add(new Option(example.name, String(index)));
+    });
+    ui.exampleStatus.textContent = examples.length
+      ? 'Choose an example, then run detection.'
+      : 'No example images are available yet. You can upload your own image above.';
+  } catch (error) {
+    console.warn('[Playground 01] Example list failed to load.', error);
+    ui.exampleStatus.textContent = 'Examples are unavailable right now. You can still upload your own image.';
+  }
+  updateControls();
+}
+async function loadExample() {
   if (running) return;
+  if (ui.exampleSelect.value === '') { resetPlayground(); return; }
+  const example = examples[Number(ui.exampleSelect.value)];
+  if (!example) return;
   const version = ++imageVersion;
+  decoding = true;
+  ui.imageError.hidden = true;
+  ui.exampleStatus.textContent = 'Loading example image...';
+  updateControls();
+  try {
+    // Encode filenames such as human&elephant1.webp; never rely on directory listing.
+    const response = await fetch(`./test/${encodeURIComponent(example.file)}`);
+    if (!response.ok) throw new Error(`Example image: HTTP ${response.status}`);
+    const blob = await response.blob();
+    if (version !== imageVersion) return; // A newer upload/example/reset takes priority.
+    await loadImageFile(new File([blob], example.file, { type: blob.type }), version);
+    if (version === imageVersion) ui.exampleStatus.textContent = 'Choose an example, then run detection.';
+  } catch (error) {
+    if (version === imageVersion) {
+      ui.imageError.textContent = 'This example image could not be loaded. Please try another example or upload your own image.';
+      ui.imageError.hidden = false;
+      ui.exampleSelect.value = '';
+      ui.exampleStatus.textContent = 'Choose another example, or try again.';
+    }
+    console.warn('[Playground 01] Example image failed to load.', error);
+  } finally {
+    if (version === imageVersion) { decoding = false; updateControls(); }
+  }
+}
+async function loadImageFile(file, selectionVersion) {
+  if (running) return;
+  const version = selectionVersion ?? ++imageVersion;
+  if (selectionVersion === undefined) {
+    ui.exampleSelect.value = '';
+    if (examples.length) ui.exampleStatus.textContent = 'Choose an example, then run detection.';
+  }
   ui.imageError.hidden = true;
   let candidateURL = null;
   decoding = true;
@@ -219,6 +279,37 @@ function mapBoxToOriginal(box, transform) {
   const clamp = (value, max) => Math.max(0, Math.min(value, max));
   return [clamp((box[0] - paddingX) / scale, width), clamp((box[1] - paddingY) / scale, height),
     clamp((box[2] - paddingX) / scale, width), clamp((box[3] - paddingY) / scale, height)];
+}
+function logRawDetections(output, transform) {
+  if (!DEBUG_DETECTIONS) return;
+  console.groupCollapsed(`[Playground 01] RAW MODEL OUTPUT — ${ui.fileName.textContent}`);
+  console.info('Exported output0 is already post-NMS; this is before browser filtering.', {
+    shape: output?.dims, type: output?.type, runtime: runtimeProvider,
+    scale: transform.scale, paddingX: transform.paddingX, paddingY: transform.paddingY
+  });
+  if (!output || String(output.dims) !== '1,300,6' || !output.data || output.data.length !== 1800) {
+    console.warn('Unexpected output contract; parsing will report an error.');
+  } else {
+    const rows = [];
+    for (let offset = 0; offset < output.data.length; offset += 6) {
+      const [x1, y1, x2, y2, confidence, classId] = output.data.slice(offset, offset + 6);
+      if ([x1, y1, x2, y2, confidence, classId].every(value => value === 0)) continue;
+      rows.push({ row: offset / 6, class_id: classId, class_name: CLASS_NAMES[classId] ?? 'Unknown', confidence, x1, y1, x2, y2 });
+    }
+    console.info(`${rows.length} non-empty rows; ${300 - rows.length} empty/padded rows. Coordinates are in the letterboxed input.`);
+    console.table(rows);
+  }
+  console.groupEnd();
+}
+function logDetectionStage(stage, detections) {
+  if (!DEBUG_DETECTIONS) return;
+  console.groupCollapsed(`[Playground 01] ${stage} — ${ui.fileName.textContent}`);
+  console.info(`Count: ${detections.length}; confidence threshold: ${CONFIDENCE_THRESHOLD}. Coordinates are in the original image.`);
+  console.table(detections.map(({ box, confidence, classId, label }) => ({
+    class_id: classId, class_name: label, confidence,
+    x1: box[0], y1: box[1], x2: box[2], y2: box[3]
+  })));
+  console.groupEnd();
 }
 function parseDetections(output, transform) {
   if (!output || output.type !== 'float32' || output.dims.length !== 3 ||
@@ -309,8 +400,11 @@ async function runDetection() {
       ui.runtimeLabel.textContent = 'Runtime: WebAssembly';
       outputs = await session.run({ images: input });
     }
+    logRawDetections(outputs.output0, transform);
     const detections = parseDetections(outputs.output0, transform);
+    logDetectionStage('DETECTIONS AFTER CONFIDENCE / UI FILTERING', detections);
     drawDetections(selectedImage, detections);
+    logDetectionStage('ANNOTATED DETECTIONS', detections);
     showSummary(detections, performance.now() - start);
     ui.detectionStatus.textContent = 'Detection complete. Try another image when you’re ready.';
   } catch (error) {
@@ -337,6 +431,8 @@ function resetPlayground() {
   if (imageURL) URL.revokeObjectURL(imageURL);
   imageURL = null;
   ui.imageInput.value = '';
+  ui.exampleSelect.value = '';
+  if (examples.length) ui.exampleStatus.textContent = 'Choose an example, then run detection.';
   ui.selectionInfo.hidden = true;
   ui.comparison.hidden = true;
   ui.imageError.hidden = true;
@@ -374,6 +470,7 @@ window.addEventListener('dragover', event => event.preventDefault());
 window.addEventListener('drop', event => event.preventDefault());
 ui.runButton.addEventListener('click', runDetection);
 ui.resetButton.addEventListener('click', resetPlayground);
+ui.exampleSelect.addEventListener('change', loadExample);
 ui.retryModel.addEventListener('click', () => {
   if (!window.ort) { location.reload(); return; }
   if (session) return;
@@ -381,3 +478,4 @@ ui.retryModel.addEventListener('click', () => {
   loadModel();
 });
 loadModel();
+loadExamples();

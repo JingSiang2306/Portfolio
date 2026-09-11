@@ -61,6 +61,79 @@ async def main():
         assert 'Elephant' in await page.locator('#detectionList').inner_text()
         await page.wait_for_timeout(250)
         await page.screenshot(path=str(output / 'real-detection.png'), full_page=True)
+        # Examples use the upload pipeline; diagnostics expose every non-empty row.
+        await page.wait_for_function('examples.length === 4')
+        await page.evaluate('''() => {
+          window.diagnosticTables=[];
+          const table=console.table.bind(console);
+          console.table=rows=>{diagnosticTables.push(JSON.parse(JSON.stringify(rows)));table(rows);};
+        }''')
+        example_results=[]
+        for index, expected_classes in enumerate([[2,2],[3,3,3],[2,2],[3]]):
+            await page.locator('#exampleSelect').select_option(str(index))
+            await page.wait_for_function('!decoding')
+            assert await page.locator('#runButton').is_enabled()
+            await page.locator('#runButton').click()
+            await page.wait_for_function('!running',timeout=120000)
+            raw, filtered, annotated = await page.evaluate('diagnosticTables.slice(-3)')
+            assert [row['class_id'] for row in raw] == expected_classes
+            assert [row['class_id'] for row in filtered] == expected_classes
+            assert filtered == annotated
+            assert await page.locator('#detectionList li').count() == len(expected_classes)
+            assert await page.locator('#resultCanvas').is_visible()
+            example_results.append({'file':await page.locator('#fileName').inner_text(),'raw':raw,'annotated':annotated})
+            if index==2:
+                await page.wait_for_timeout(250)
+                await page.screenshot(path=str(output/'mixed-example.png'),full_page=True)
+        (output/'example-diagnosis.json').write_text(json.dumps(example_results,indent=2))
+        print('EXAMPLES:',json.dumps(example_results),flush=True)
+        await page.locator('#resetButton').click()
+        assert await page.locator('#exampleSelect').input_value()==''
+        assert await page.locator('#imageInput').input_value()==''
+        assert await page.locator('#comparison').is_hidden()
+        await page.locator('#exampleSelect').select_option('0')
+        await page.wait_for_function('!decoding')
+        await page.locator('#imageInput').set_input_files(str(ROOT/'playground01/test/human1.jpg'))
+        await page.wait_for_function('!decoding')
+        assert await page.locator('#exampleSelect').input_value()==''
+        assert await page.locator('#fileName').inner_text()=='human1.jpg'
+        await page.route('**/test/elephant1.jpg',lambda route:route.fulfill(status=404,body='missing'))
+        await page.locator('#exampleSelect').select_option('0')
+        await page.wait_for_function('!decoding')
+        assert 'This example image could not be loaded' in await page.locator('#imageError').inner_text()
+        await page.unroute('**/test/elephant1.jpg')
+        # An upload or reset must beat an older, slow example download.
+        for replacement in ['upload','reset','example']:
+            started, release = asyncio.Event(), asyncio.Event()
+            async def delayed_example(route):
+                started.set()
+                await release.wait()
+                await route.fulfill(path=str(ROOT/'playground01/test/elephant1.jpg'),content_type='image/jpeg')
+            await page.route('**/test/elephant1.jpg',delayed_example)
+            await page.locator('#exampleSelect').select_option('0')
+            await started.wait()
+            if replacement=='upload':
+                await page.locator('#imageInput').set_input_files(str(ROOT/'playground01/test/human1.jpg'))
+            elif replacement=='reset':
+                await page.locator('#resetButton').click()
+            else:
+                await page.locator('#exampleSelect').select_option('1')
+            await page.wait_for_function('!decoding')
+            release.set()
+            await page.wait_for_timeout(150)
+            if replacement=='reset': assert await page.locator('#comparison').is_hidden()
+            else: assert await page.locator('#fileName').inner_text()=='human1.jpg'
+            await page.unroute('**/test/elephant1.jpg')
+        for manifest_body, status, expected in [('[]',200,'No example images'),('missing',404,'Examples are unavailable')]:
+            empty=await context.new_page()
+            await empty.route('**/test/images.json',lambda route:route.fulfill(status=status,body=manifest_body,content_type='application/json'))
+            await empty.route('**/weights/best.onnx',lambda route:route.fulfill(status=404,body='skip model in manifest-only test'))
+            await empty.goto(origin+'/playground01/')
+            await empty.wait_for_function("!document.querySelector('#exampleStatus').textContent.includes('Loading')")
+            assert expected in await empty.locator('#exampleStatus').inner_text()
+            assert await empty.locator('#exampleSelect').is_disabled()
+            assert await empty.locator('#dropzone').is_enabled()
+            await empty.close()
         # Validate preprocessing numerically, including channel order and padding.
         math_checks = await page.evaluate('''() => {
           const results = [];
@@ -139,10 +212,15 @@ async def main():
         assert 'could not finish' in await page.locator('#detectionStatus').inner_text()
         assert await page.locator('#resultCanvas').is_hidden()
         await page.evaluate('() => { session.run=window.savedRun; }')
+        await page.locator('#exampleSelect').select_option('2')
+        await page.wait_for_function('!decoding')
+        await page.locator('#runButton').click()
+        await page.wait_for_function('!running',timeout=120000)
         await page.locator('#themeToggle').click()
         assert await page.evaluate('document.documentElement.dataset.theme') == 'light'
         await page.set_viewport_size({'width':390,'height':844})
         await page.emulate_media(reduced_motion='reduce')
+        await page.wait_for_timeout(250)
         await page.screenshot(path=str(output / 'mobile-light.png'), full_page=True)
         boxes=await page.locator('.comparison figure').evaluate_all('(els)=>els.map(e=>({x:e.getBoundingClientRect().x,y:e.getBoundingClientRect().y}))')
         assert boxes[0]['x']==boxes[1]['x'] and boxes[1]['y']>boxes[0]['y']
@@ -175,6 +253,13 @@ async def main():
             await fallback.wait_for_function('!running',timeout=120000)
             assert 'Elephant' in await fallback.locator('#detectionList').inner_text()
             print('FALLBACK:',scenario,await fallback.locator('#detectionList').inner_text(),flush=True)
+            await fallback.locator('#exampleSelect').select_option('2')
+            await fallback.wait_for_function('!decoding')
+            await fallback.locator('#runButton').click()
+            await fallback.wait_for_function('!running',timeout=120000)
+            assert await fallback.locator('#detectionList li').count()==2
+            assert 'Human' not in await fallback.locator('#detectionList').inner_text()
+            print('MIXED WASM:',await fallback.locator('#detectionList').inner_text(),flush=True)
             if scenario=='gpu-absent':
                 await fallback.evaluate("() => { session.run=async()=>{throw Error('Test inference failure')}; }")
                 await fallback.locator('#runButton').click()
@@ -197,6 +282,16 @@ async def main():
         assert await link.get_attribute('href')=='playground01/'
         assert await link.get_attribute('target')=='_blank'
         assert await link.get_attribute('rel')=='noopener noreferrer'
+        assert 'btn-primary' in await link.get_attribute('class')
+        await link.hover()
+        await portfolio.wait_for_timeout(250)
+        assert await portfolio.locator('#playgroundHint').is_visible()
+        await portfolio.screenshot(path=str(output/'portfolio-tooltip.png'),full_page=True)
+        await portfolio.mouse.move(0,0)
+        await portfolio.keyboard.press('Tab')
+        await link.focus()
+        assert await link.evaluate("e=>e.matches(':focus-visible')")
+        assert await portfolio.locator('#playgroundHint').is_visible()
         async with portfolio.expect_popup() as popup_event:
             await link.click()
         popup=await popup_event.value

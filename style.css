@@ -291,6 +291,21 @@
   }
   .project-links a:hover{ color:var(--copper); }
 
+  .project-playground{ position:relative; display:inline-block; }
+  html[data-theme="light"] .project-playground .btn-primary:hover{ background:#963D0C; }
+  .playground-tooltip{
+    position:absolute; top:calc(100% + 8px); left:0; z-index:5;
+    width:250px; max-width:calc(100vw - 80px); padding:10px 12px;
+    background:var(--navy-panel); color:var(--paper); border:1px solid var(--line-blue);
+    border-left:2px solid var(--teal); border-radius:var(--radius);
+    font:12px/1.5 'Inter',sans-serif; text-align:left;
+    opacity:0; visibility:hidden; transform:translateY(-3px);
+  }
+  .project-playground .btn:focus-visible{ outline:2px solid var(--teal); outline-offset:4px; }
+  .project-playground .btn:focus-visible + .playground-tooltip{ opacity:1; visibility:visible; transform:none; }
+  @media (hover:hover){ .project-playground:hover .playground-tooltip{ opacity:1; visibility:visible; transform:none; } }
+  @media (prefers-reduced-motion:no-preference){ .playground-tooltip{ transition:opacity .18s,transform .18s,visibility .18s; } }
+
   .add-project{
     border:1px dashed var(--line-blue); padding:30px; text-align:center;
     font-family:'JetBrains Mono', monospace; color:var(--paper-dim); font-size:13px;

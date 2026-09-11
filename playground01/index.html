@@ -40,7 +40,7 @@
       </div>
       <div class="runtime-row">
         <span id="runtimeLabel">Runtime: preparing</span>
-        <span>MODEL / ~10.15 MB · DOWNLOADS ONCE PER VISIT</span>
+        <span>MODEL / ~10.15 MB</span>
       </div>
       <div class="model-error" id="modelError" hidden>
         <p id="modelErrorText" role="alert"></p>
@@ -48,6 +48,7 @@
       </div>
 
       <div class="upload-section">
+        <h3 class="option-title">Option 1 — Upload Your Own Image</h3>
         <input type="file" id="imageInput" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" hidden>
         <button class="dropzone" id="dropzone" type="button" aria-describedby="uploadHelp">
           <svg class="upload-icon" viewBox="0 0 48 48" fill="none" aria-hidden="true"><path d="M24 31V10m-8 8 8-8 8 8M10 30v8h28v-8" stroke="currentColor" stroke-width="1.5"/><path d="M5 13V5h8m22 0h8v8M5 35v8h8m22 0h8v-8" stroke="currentColor" opacity=".35"/></svg>
@@ -55,9 +56,20 @@
           <span>or <span class="browse-text">browse files ↗</span></span>
           <small id="uploadHelp">JPG, JPEG, PNG or WEBP · Maximum 10 MB</small>
         </button>
-        <p class="upload-error" id="imageError" role="alert" hidden></p>
-        <div class="selection-row" id="selectionInfo" hidden><span id="fileName"></span><span id="imageDimensions"></span></div>
       </div>
+
+      <div class="option-divider" aria-hidden="true">OR</div>
+      <section class="example-section" aria-labelledby="exampleTitle">
+        <h3 class="option-title" id="exampleTitle">Option 2 — Try an Example Image</h3>
+        <p>Don't have an image? Try one of the prepared examples.</p>
+        <label for="exampleSelect">Try an example</label>
+        <select id="exampleSelect" aria-describedby="exampleStatus" disabled>
+          <option value="">Select an example image</option>
+        </select>
+        <p id="exampleStatus" role="status">Loading examples...</p>
+      </section>
+      <p class="upload-error" id="imageError" role="alert" hidden></p>
+      <div class="selection-row" id="selectionInfo" hidden><span id="fileName"></span><span id="imageDimensions"></span></div>
 
       <div class="action-row">
         <button class="button primary" id="runButton" type="button" disabled>Run Detection</button>

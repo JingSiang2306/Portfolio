@@ -13,15 +13,85 @@ playground01/
   style.css
   script.js
   README.md
+  test/
+    images.json    # editable example list; filenames must match the actual files
+    elephant1.jpg
+    human1.jpg
+    human&elephant1.webp
+    human&car1.jpg
   weights/
     best.onnx       # supplied model, not generated or modified by this integration
 tests/
   playground_browser.py  # development-only browser tests
 ```
 
-The only existing portfolio file changed for this feature is the root
-`index.html`: Project 01 now has a `Playground ↗` link using the existing
-`project-links` styling, `target="_blank"`, and `rel="noopener noreferrer"`.
+The root `index.html` uses the existing `btn btn-primary` styling for Project 01's
+`Playground ↗` button, with `target="_blank"` and `rel="noopener noreferrer"`.
+Root `style.css` adds its custom tooltip, revealed on hover or keyboard focus.
+Other portfolio content and functionality are unchanged.
+
+## Example images
+
+Visitors can upload their own image or select one of the four prepared examples.
+The dropdown fetches `test/images.json`, then fetches the chosen image and passes
+it as a browser File into the same `loadImageFile()` used by uploads. Preprocessing,
+inference, filtering and drawing are shared. Switching sources or resetting
+invalidates pending selections, so a slow example cannot overwrite a newer upload.
+
+To add an example, put the real JPG/JPEG/PNG/WebP file in `playground01/test/`
+and add an entry to `images.json`, using its exact filename:
+
+```json
+{ "name": "Elephants", "file": "elephant1.jpg" }
+```
+
+Keep entries in a JSON array separated by commas. No directory listing or build
+step is needed. An empty `[]` shows an informative empty state; missing files or
+an unavailable manifest show friendly messages while uploads remain available.
+Commit the manifest and example files for them to appear on Vercel. Examples are
+downloaded from the static site; visitor images are never uploaded.
+
+## Mixed-image diagnosis and console diagnostics
+
+Before changing the interface, the unmodified browser pipeline was tested with
+the supplied images. Both code inspection and the model's `names` metadata confirm
+the six-class mapping below. No explicit elephant-only detection filter exists.
+Elephant-specific code only sets box color and calculates a separate summary count.
+
+| Image | Non-empty output rows | Class IDs | Raw confidence values |
+| --- | --- | --- | --- |
+| elephant1.jpg | 2 | 2, 2 | 0.89982128, 0.78355461 |
+| human1.jpg | 3 | 3, 3, 3 | 0.91543609, 0.91201675, 0.88792562 |
+| human&elephant1.webp | 2 | 2, 2 | 0.89525974, 0.41449955 |
+| human&car1.jpg | 1 | 3 | 0.80381525 |
+
+All these rows survive the unchanged 0.25 browser threshold and are annotated.
+The mixed image has 298 zero/padded rows and **no Human row** in `output0`.
+Its two Elephant boxes correspond to the large elephant and the partial elephant
+at the left edge. The human-only image really returns class 3 (Human).
+
+This is **Case B: actual exported-model behaviour**, not a frontend class filter,
+browser threshold issue or lost annotation. The output is already post-NMS: it
+does not expose low-scoring or suppressed candidates inside the model, so these
+observations cannot establish the exact internal reason the human is missed.
+No weights, thresholds, class mapping or detection rules were changed to force a
+Human prediction. The mixed result was also checked with the WASM provider.
+
+Open browser DevTools → Console, enable Info messages, run each image, and expand:
+
+- `RAW MODEL OUTPUT`: every non-empty `output0` row before browser filtering,
+  with original confidence, class ID/name and 640×640 letterbox coordinates.
+- `DETECTIONS AFTER CONFIDENCE / UI FILTERING`: retained rows, with coordinates
+  mapped to the original image and clamped to its boundaries.
+- `ANNOTATED DETECTIONS`: rows passed through the successful Canvas drawing loop.
+
+Groups include the image filename so separate runs can be compared. For the mixed
+image, expect two class-2 rows in all three groups and no class-3 row. If a future
+image has a raw Human row below 0.25 that disappears after filtering, that is Case C;
+if a retained row is missing visually, compare the mapped coordinates and annotation
+stage. `DEBUG_DETECTIONS` near the top of `script.js` disables logs when set to false.
+The browser tests save complete raw/annotated example tables in their temporary
+`example-diagnosis.json` report. Small numerical differences across devices are possible.
 
 ## Model and configuration
 
