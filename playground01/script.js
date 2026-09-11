@@ -3,6 +3,7 @@
 // Model configuration. Names come from this best.onnx file's export metadata.
 const CONFIDENCE_THRESHOLD = 0.25;
 const DEBUG_DETECTIONS = true; // Show raw, filtered and annotated rows in DevTools.
+const RESET_TRANSITION_MS = 300;
 const CLASS_NAMES = ['Car', 'Cow', 'Elephant', 'Human', 'Motorbike', 'Sheep'];
 const ELEPHANT_CLASS_ID = 2;
 const MODEL_URL = './weights/best.onnx';
@@ -19,7 +20,7 @@ const ui = Object.fromEntries([
   'selectionInfo', 'fileName', 'imageDimensions', 'runButton', 'resetButton',
   'detectionStatus', 'comparison', 'originalImage', 'resultCanvas',
   'resultPlaceholder', 'resultSummary', 'detectionCount', 'detectionList',
-  'emptyResult', 'inferenceTime', 'thresholdNote', 'exampleSelect', 'exampleStatus'
+  'emptyResult', 'inferenceTime', 'thresholdNote', 'exampleSelect', 'exampleStatus', 'resultsRegion'
 ].map(id => [id, document.getElementById(id)]));
 
 let session = null;
@@ -31,6 +32,7 @@ let imageURL = null;
 let imageVersion = 0;
 let decoding = false;
 let running = false;
+let resetting = false;
 let dragDepth = 0;
 let examples = [];
 
@@ -42,12 +44,12 @@ function applyTheme(theme) {
   ui.themeToggle.setAttribute('aria-pressed', String(theme === 'light'));
 }
 function updateControls() {
-  ui.runButton.disabled = !session || !selectedImage || running || decoding;
+  ui.runButton.disabled = !session || !selectedImage || running || decoding || resetting;
   ui.runButton.textContent = running ? 'Running detection...' : 'Run Detection';
-  ui.dropzone.disabled = running;
-  ui.imageInput.disabled = running;
-  ui.exampleSelect.disabled = running || !examples.length;
-  ui.resetButton.disabled = running;
+  ui.dropzone.disabled = running || resetting;
+  ui.imageInput.disabled = running || resetting;
+  ui.exampleSelect.disabled = running || resetting || !examples.length;
+  ui.resetButton.disabled = running || resetting;
   ui.resetButton.hidden = !selectedImage && !decoding;
   ui.comparison.setAttribute('aria-busy', String(running));
 }
@@ -165,7 +167,7 @@ async function loadExamples() {
   updateControls();
 }
 async function loadExample() {
-  if (running) return;
+  if (running || resetting) return;
   if (ui.exampleSelect.value === '') { resetPlayground(); return; }
   const example = examples[Number(ui.exampleSelect.value)];
   if (!example) return;
@@ -195,7 +197,7 @@ async function loadExample() {
   }
 }
 async function loadImageFile(file, selectionVersion) {
-  if (running) return;
+  if (running || resetting) return;
   const version = selectionVersion ?? ++imageVersion;
   if (selectionVersion === undefined) {
     ui.exampleSelect.value = '';
@@ -376,7 +378,7 @@ function showSummary(detections, elapsed) {
   ui.resultSummary.hidden = false;
 }
 async function runDetection() {
-  if (!session || !selectedImage || running || decoding) return;
+  if (!session || !selectedImage || running || decoding || resetting) return;
   running = true;
   clearResults();
   ui.detectionStatus.textContent = 'Running detection...';
@@ -422,10 +424,25 @@ async function runDetection() {
     updateControls();
   }
 }
-function resetPlayground() {
-  if (running) return;
+async function resetPlayground() {
+  if (running || resetting) return;
+  resetting = true;
+  // Invalidate pending image downloads before the exit transition begins.
   imageVersion++;
   decoding = false;
+  updateControls();
+  const region = ui.resultsRegion;
+  const height = region.getBoundingClientRect().height;
+  let collapse;
+  if (height > 0 && !matchMedia('(prefers-reduced-motion: reduce)').matches && region.animate) {
+    // Keep the preview intact while its container folds upward, then clear it.
+    region.style.overflow = 'hidden';
+    collapse = region.animate([
+      { height: `${height}px`, opacity: 1, transform: 'translateY(0)' },
+      { height: '0px', opacity: 0, transform: 'translateY(-8px)' }
+    ], { duration: RESET_TRANSITION_MS, easing: 'cubic-bezier(.4,0,.2,1)', fill: 'forwards' });
+    await collapse.finished.catch(() => {});
+  }
   selectedImage = null;
   ui.originalImage.removeAttribute('src');
   if (imageURL) URL.revokeObjectURL(imageURL);
@@ -439,8 +456,11 @@ function resetPlayground() {
   clearResults();
   ui.resultCanvas.width = ui.resultCanvas.height = 1;
   ui.detectionStatus.textContent = 'Choose an image to get started.';
+  collapse?.cancel();
+  region.style.removeProperty('overflow');
+  resetting = false;
   updateControls();
-  ui.dropzone.focus();
+  ui.dropzone.focus({ preventScroll: true });
 }
 
 ui.themeToggle.addEventListener('click', () => {

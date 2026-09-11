@@ -70,6 +70,7 @@ h2{font-size:21px}
 .model-error button{margin-top:12px}
 .upload-error{margin:12px 0 0}
 .comparison{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px;margin-top:26px}
+.results-region{display:flow-root}
 figure{margin:0;min-width:0;border:1px solid var(--line-blue-soft);background:var(--navy-panel)}
 figcaption{border-bottom:1px solid var(--line-blue-soft);padding:12px 14px;font-size:12px;font-weight:500}
 figcaption span{font:10px 'JetBrains Mono',monospace;color:var(--teal);margin-right:8px}

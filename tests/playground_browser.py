@@ -87,7 +87,16 @@ async def main():
                 await page.screenshot(path=str(output/'mixed-example.png'),full_page=True)
         (output/'example-diagnosis.json').write_text(json.dumps(example_results,indent=2))
         print('EXAMPLES:',json.dumps(example_results),flush=True)
+        # Preview remains intact mid-collapse, and controls prevent overlapping work.
+        initial_height=await page.locator('#resultsRegion').evaluate('(e)=>e.getBoundingClientRect().height')
         await page.locator('#resetButton').click()
+        await page.wait_for_timeout(100)
+        assert await page.evaluate('resetting')
+        current_height=await page.locator('#resultsRegion').evaluate('(e)=>e.getBoundingClientRect().height')
+        assert 0 < current_height < initial_height
+        assert await page.locator('#comparison').is_visible()
+        assert await page.locator('#runButton').is_disabled()
+        await page.wait_for_function('!resetting')
         assert await page.locator('#exampleSelect').input_value()==''
         assert await page.locator('#imageInput').input_value()==''
         assert await page.locator('#comparison').is_hidden()
@@ -118,7 +127,7 @@ async def main():
                 await page.locator('#resetButton').click()
             else:
                 await page.locator('#exampleSelect').select_option('1')
-            await page.wait_for_function('!decoding')
+            await page.wait_for_function('!decoding && !resetting')
             release.set()
             await page.wait_for_timeout(150)
             if replacement=='reset': assert await page.locator('#comparison').is_hidden()
@@ -173,6 +182,7 @@ async def main():
         # Blank portrait/square images exercise the real model and session reuse.
         for width, height in [(360,640),(640,640)]:
             await page.locator('#resetButton').click()
+            await page.wait_for_function('!resetting')
             data_url = await page.evaluate('''([w,h]) => {
               const c=document.createElement('canvas');c.width=w;c.height=h;
               const x=c.getContext('2d');x.fillStyle='#728291';x.fillRect(0,0,w,h);
@@ -225,6 +235,11 @@ async def main():
         boxes=await page.locator('.comparison figure').evaluate_all('(els)=>els.map(e=>({x:e.getBoundingClientRect().x,y:e.getBoundingClientRect().y}))')
         assert boxes[0]['x']==boxes[1]['x'] and boxes[1]['y']>boxes[0]['y']
         assert await page.evaluate('document.documentElement.scrollWidth <= innerWidth')
+        # Reduced motion clears immediately, without a collapse animation.
+        await page.locator('#resetButton').click()
+        assert not await page.evaluate('resetting')
+        assert await page.locator('#comparison').is_hidden()
+        assert await page.locator('#resultsRegion').evaluate('(e)=>e.getAnimations().length')==0
         assert not errors, errors
         assert all(method == 'GET' for method, _ in network), network
         assert sum('/weights/best.onnx' in url for _, url in network) == 1
@@ -278,10 +293,9 @@ async def main():
         await missing.close()
         portfolio=await context.new_page()
         await portfolio.goto(origin+'/')
-        link=portfolio.get_by_role('link',name='Playground ↗',exact=True)
+        link=portfolio.get_by_role('link',name='Playground →',exact=True)
         assert await link.get_attribute('href')=='playground01/'
-        assert await link.get_attribute('target')=='_blank'
-        assert await link.get_attribute('rel')=='noopener noreferrer'
+        assert await link.get_attribute('target') is None
         assert 'btn-primary' in await link.get_attribute('class')
         await link.hover()
         await portfolio.wait_for_timeout(250)
@@ -292,12 +306,13 @@ async def main():
         await link.focus()
         assert await link.evaluate("e=>e.matches(':focus-visible')")
         assert await portfolio.locator('#playgroundHint').is_visible()
-        async with portfolio.expect_popup() as popup_event:
-            await link.click()
-        popup=await popup_event.value
-        await popup.wait_for_load_state('domcontentloaded')
-        assert popup.url==origin+'/playground01/'
-        await popup.close()
+        tab_count=len(context.pages)
+        await link.click()
+        await portfolio.wait_for_url(origin+'/playground01/')
+        assert len(context.pages)==tab_count
+        await portfolio.locator('.back-link').click()
+        await portfolio.wait_for_url(origin+'/#projects')
+        assert len(context.pages)==tab_count
         await portfolio.close()
         assert hashlib.sha256(model.read_bytes()).hexdigest() == digest
         print(json.dumps({'result': 'PASS', 'screenshots': str(output), 'requests': network}), flush=True)

@@ -17,7 +17,7 @@
 <body>
   <header class="site-header">
     <div class="wrap header-inner">
-      <a class="back-link" href="../">← Back to Portfolio</a>
+      <a class="back-link" href="../#projects">← Back to Portfolio</a>
       <span class="header-tag">PROJECT 01 / AI PLAYGROUND</span>
       <button id="themeToggle" class="theme-toggle" type="button" aria-label="Switch to light theme" aria-pressed="false">☀</button>
     </div>
@@ -76,6 +76,7 @@
         <button class="button secondary" id="resetButton" type="button" hidden>Try Another Image</button>
         <p id="detectionStatus" role="status" aria-live="polite">Choose an image to get started.</p>
       </div>
+      <div class="results-region" id="resultsRegion">
       <div class="comparison" id="comparison" hidden aria-busy="false">
         <figure>
           <figcaption><span>01</span> Original Image</figcaption>
@@ -96,6 +97,7 @@
         <ul id="detectionList"></ul>
         <p class="threshold-note" id="thresholdNote"></p>
       </section>
+      </div>
     </section>
     <p class="disclaimer">AI predictions may not always be correct. This demo uses the model developed for the project and runs locally in your browser.</p>
     <footer><span>CHENG JING SIANG / PROJECT 01</span><span>LOCAL INFERENCE · YOUR IMAGE STAYS WITH YOU</span></footer>

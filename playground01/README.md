@@ -26,7 +26,8 @@ tests/
 ```
 
 The root `index.html` uses the existing `btn btn-primary` styling for Project 01's
-`Playground ↗` button, with `target="_blank"` and `rel="noopener noreferrer"`.
+`Playground →` button, opening in the same tab. Back to Portfolio returns to
+`../#projects`, avoiding duplicate portfolio tabs.
 Root `style.css` adds its custom tooltip, revealed on hover or keyboard focus.
 Other portfolio content and functionality are unchanged.
 
@@ -37,6 +38,9 @@ The dropdown fetches `test/images.json`, then fetches the chosen image and passe
 it as a browser File into the same `loadImageFile()` used by uploads. Preprocessing,
 inference, filtering and drawing are shared. Switching sources or resetting
 invalidates pending selections, so a slow example cannot overwrite a newer upload.
+Try Another Image folds the preview and summary upward over 300 ms before clearing
+them. Controls pause during the transition; reduced-motion preferences skip it.
+Adjust `RESET_TRANSITION_MS` near the top of `script.js` to change the duration.
 
 To add an example, put the real JPG/JPEG/PNG/WebP file in `playground01/test/`
 and add an entry to `images.json`, using its exact filename:
@@ -219,7 +223,8 @@ Verified on 2026-09-11:
 - File-picker and WebP drag/drop; unsupported, oversized and corrupt files.
 - Unexpected output, simulated inference failure, missing model and retry.
 - Light theme, mobile stacking, reduced motion, no page overflow.
-- Project link opens the correct path in a new tab.
+- Project link and Back to Portfolio navigate in the same tab.
+- Reset collapses upward, blocks overlapping actions and respects reduced motion.
 - Only GET requests during the image flow; no image uploads.
 
 For a manual check, wait for Model ready, select an image, run detection, then
