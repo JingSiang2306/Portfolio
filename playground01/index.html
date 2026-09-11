@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Try the Project 01 elephant-detection model locally in your browser. Your images are never uploaded.">
+  <title>Elephant Detection Playground — Cheng Jing Siang</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%2308131f'/%3E%3Ctext x='5' y='22' fill='%235eead4' font-family='monospace' font-size='17'%3E01%3C/text%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./style.css">
+  <script>try { if (localStorage.getItem('portfolio-theme') === 'light') document.documentElement.dataset.theme = 'light'; } catch {}</script>
+  <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web@1.29.0/dist/ort.webgpu.min.js" defer></script>
+  <script src="./script.js" defer></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap header-inner">
+      <a class="back-link" href="../">← Back to Portfolio</a>
+      <span class="header-tag">PROJECT 01 / AI PLAYGROUND</span>
+      <button id="themeToggle" class="theme-toggle" type="button" aria-label="Switch to light theme" aria-pressed="false">☀</button>
+    </div>
+  </header>
+  <main class="wrap">
+    <section class="intro" aria-labelledby="pageTitle">
+      <p class="eyebrow"><span></span> COMPUTER VISION / FIELD EXPERIMENT 01</p>
+      <h1 id="pageTitle">Elephant Detection<br><span>Playground</span></h1>
+      <p class="lead">Test the elephant-detection model developed for Project 01 directly in your browser.</p>
+      <p class="privacy"><span aria-hidden="true">↳</span> Images are processed locally in your browser and are not uploaded.</p>
+    </section>
+
+    <section class="workbench" aria-label="Elephant detection demo">
+      <div class="workbench-head">
+        <div><span class="section-number">01 /</span> <h2>Test an image</h2></div>
+        <div class="model-indicator" id="modelIndicator" data-state="loading">
+          <span class="status-dot" aria-hidden="true"></span>
+          <span id="modelStatus" role="status">Loading AI model...</span>
+        </div>
+      </div>
+      <div class="runtime-row">
+        <span id="runtimeLabel">Runtime: preparing</span>
+        <span>MODEL / ~10.15 MB · DOWNLOADS ONCE PER VISIT</span>
+      </div>
+      <div class="model-error" id="modelError" hidden>
+        <p id="modelErrorText" role="alert"></p>
+        <button class="button secondary" id="retryModel" type="button">Retry Model Loading</button>
+      </div>
+
+      <div class="upload-section">
+        <input type="file" id="imageInput" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" hidden>
+        <button class="dropzone" id="dropzone" type="button" aria-describedby="uploadHelp">
+          <svg class="upload-icon" viewBox="0 0 48 48" fill="none" aria-hidden="true"><path d="M24 31V10m-8 8 8-8 8 8M10 30v8h28v-8" stroke="currentColor" stroke-width="1.5"/><path d="M5 13V5h8m22 0h8v8M5 35v8h8m22 0h8v-8" stroke="currentColor" opacity=".35"/></svg>
+          <strong>Drop an image here</strong>
+          <span>or <span class="browse-text">browse files ↗</span></span>
+          <small id="uploadHelp">JPG, JPEG, PNG or WEBP · Maximum 10 MB</small>
+        </button>
+        <p class="upload-error" id="imageError" role="alert" hidden></p>
+        <div class="selection-row" id="selectionInfo" hidden><span id="fileName"></span><span id="imageDimensions"></span></div>
+      </div>
+
+      <div class="action-row">
+        <button class="button primary" id="runButton" type="button" disabled>Run Detection</button>
+        <button class="button secondary" id="resetButton" type="button" hidden>Try Another Image</button>
+        <p id="detectionStatus" role="status" aria-live="polite">Choose an image to get started.</p>
+      </div>
+      <div class="comparison" id="comparison" hidden aria-busy="false">
+        <figure>
+          <figcaption><span>01</span> Original Image</figcaption>
+          <div class="image-stage"><img id="originalImage" alt="Selected image before detection"></div>
+        </figure>
+        <figure>
+          <figcaption><span>02</span> Detection Result</figcaption>
+          <div class="image-stage">
+            <p class="result-placeholder" id="resultPlaceholder">Bounding boxes will appear here<br>after you run detection.</p>
+            <canvas id="resultCanvas" hidden role="img" aria-label="Detection result" aria-describedby="resultSummary"></canvas>
+          </div>
+        </figure>
+      </div>
+      <section class="summary" id="resultSummary" aria-labelledby="summaryTitle" hidden>
+        <div class="summary-head"><h3 id="summaryTitle">Detection summary</h3><span id="inferenceTime"></span></div>
+        <p id="detectionCount"></p>
+        <p id="emptyResult" hidden>No elephants detected above the confidence threshold.</p>
+        <ul id="detectionList"></ul>
+        <p class="threshold-note" id="thresholdNote"></p>
+      </section>
+    </section>
+    <p class="disclaimer">AI predictions may not always be correct. This demo uses the model developed for the project and runs locally in your browser.</p>
+    <footer><span>CHENG JING SIANG / PROJECT 01</span><span>LOCAL INFERENCE · YOUR IMAGE STAYS WITH YOU</span></footer>
+    <noscript><p class="model-error">This playground requires JavaScript. You can still <a href="../">read the portfolio</a>.</p></noscript>
+  </main>
+</body>
+</html>
