@@ -1,10 +1,12 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { TrackballControls } from 'three/addons/controls/TrackballControls.js';
 import { COMPONENT_INFO } from './component-info.js';
 
-// Replace this URL when a corrected export is ready. No part-specific transforms are used.
+// This SOLIDWORKS export is upside down in Y-up: correct the whole assembly,
+// preserving every component's local transform and alignment.
 const MODEL_URL = new URL('./models/Holder_v7.glb', import.meta.url).href;
+const MODEL_ROTATION_Z = Math.PI;
 const $ = selector => document.querySelector(selector);
 const viewport = $('#viewport');
 const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
@@ -52,12 +54,12 @@ function initScene() {
   canvas.setAttribute('aria-describedby', 'navigationHelp');
   viewport.prepend(canvas);
   camera = new THREE.PerspectiveCamera(40, 1, 0.01, 100);
-  controls = new OrbitControls(camera, canvas);
-  controls.enableDamping = !reducedMotion.matches;
-  controls.dampingFactor = 0.09;
-  controls.screenSpacePanning = true;
+  controls = new TrackballControls(camera, canvas);
+  // Direct manipulation permits repeated full pitch turns without pole clamps.
+  controls.staticMoving = true;
+  controls.rotateSpeed = 2;
+  controls.keys = [];
   controls.enabled = false;
-  controls.listenToKeyEvents(canvas);
   controls.addEventListener('change', requestRender);
   controls.addEventListener('start', () => {
     cameraAnimation = null;
@@ -80,6 +82,7 @@ async function loadModel() {
       if (event.total > 0) $('#loadProgress').value = event.loaded / event.total * 100;
     });
     model = gltf.scene;
+    model.rotateZ(MODEL_ROTATION_Z);
     model.updateMatrixWorld(true);
     const bounds = new THREE.Box3().setFromObject(model);
     if (bounds.isEmpty() || !Number.isFinite(bounds.min.length() + bounds.max.length())) {
@@ -134,7 +137,10 @@ function discoverComponents(gltf) {
     const component = {
       id: components.length, node, sourceName,
       name: info?.displayName || sourceName,
-      description: info?.description || 'Component description can be added here.',
+      description: info?.description || (/^HAT Part|^Cam Rear|^Pi Part|^Cam Part/.test(sourceName)
+        ? 'Subcomponent retained from the CAD export; its exact function is not specified in the source.'
+        : `${sourceName} in the mechanical assembly.`),
+      originalName: nodes[index].extras?.originalName || sourceName,
       meshes: [], visible: true,
       originalPosition: node.position.clone(),
       originalQuaternion: node.quaternion.clone(),
@@ -266,7 +272,7 @@ function selectComponent(part) {
   components.forEach(component => component.row.querySelector('.component-select').setAttribute('aria-pressed', String(component === part)));
   $('#selectedName').textContent = part?.name || 'Select a component';
   $('#selectedDescription').textContent = part?.description || 'Choose a part in the viewport or component list to inspect it.';
-  $('#selectedSource').textContent = part ? `SOURCE / ${part.sourceName}` : '';
+  $('#selectedSource').textContent = part ? `SOURCE / ${part.originalName}` : '';
   $('#selectedVisibility').disabled = !part;
   $('#selectedIsolate').disabled = !part;
   $('#clearSelection').disabled = !part;
@@ -369,21 +375,22 @@ function fitDistance(amount) {
   return radius * 1.12 / Math.sin(Math.min(vertical, horizontal));
 }
 
-function frameModel(direction, amount = explosionTarget, immediate = false) {
-  // Drain OrbitControls damping before taking ownership of the camera.
-  controls.enableDamping = false;
+function frameModel(direction, amount = explosionTarget, immediate = false, up = camera.up) {
+  // Consume pending input before the preset/fit animation takes camera ownership.
   controls.update();
-  controls.enableDamping = !reducedMotion.matches;
   const distance = fitDistance(amount);
   const position = assemblyCenter.clone().addScaledVector(direction.clone().normalize(), distance);
   cameraAnimation = {
     from: camera.position.clone(), to: position,
     fromTarget: controls.target.clone(), toTarget: assemblyCenter.clone(),
+    fromUp: camera.up.clone(),
+    upRotation: new THREE.Quaternion().setFromUnitVectors(camera.up.clone().normalize(), up.clone().normalize()),
     start: performance.now(), duration: 500
   };
   if (immediate || reducedMotion.matches) {
     camera.position.copy(position);
     controls.target.copy(assemblyCenter);
+    camera.up.copy(up);
     camera.lookAt(assemblyCenter);
     controls.update();
     cameraAnimation = null;
@@ -400,7 +407,8 @@ function setPresetLabel(name) {
 function moveToPresetView(name) {
   if (!ready) return;
   setPresetLabel(name);
-  frameModel(presets[name]);
+  // TOP needs a nonparallel up vector. Presets also clear any trackball roll.
+  frameModel(presets[name], explosionTarget, false, new THREE.Vector3(0, name === 'TOP' ? 0 : 1, name === 'TOP' ? -1 : 0));
 }
 
 function resetViewer() {
@@ -420,6 +428,7 @@ function resizeViewer() {
   const height = viewport.clientHeight;
   if (!width || !height) return;
   renderer.setSize(width, height, false);
+  controls?.handleResize();
   camera.aspect = width / height;
   camera.updateProjectionMatrix();
   if (ready) frameModel(camera.position.clone().sub(controls.target).normalize(), explosionTarget, true);
@@ -462,11 +471,13 @@ function bindEvents() {
   });
   const canvas = renderer.domElement;
   canvas.addEventListener('pointerdown', event => {
+    controls.handleResize();
     activePointers.add(event.pointerId);
     if (event.button !== 0 || activePointers.size !== 1) { pointerStart = null; return; }
     pointerStart = { id: event.pointerId, x: event.clientX, y: event.clientY, moved: false };
   });
   canvas.addEventListener('pointermove', event => {
+    requestRender();
     if (pointerStart && Math.hypot(event.clientX - pointerStart.x, event.clientY - pointerStart.y) > 5) pointerStart.moved = true;
   });
   canvas.addEventListener('pointerup', event => {
@@ -475,9 +486,23 @@ function bindEvents() {
     pointerStart = null;
   });
   canvas.addEventListener('pointercancel', event => { activePointers.delete(event.pointerId); pointerStart = null; });
+  canvas.addEventListener('wheel', requestRender, { passive: true });
   canvas.addEventListener('keydown', event => {
     if (!ready) return;
     if (event.key === 'Escape') clearSelection();
+    if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(event.key)) {
+      event.preventDefault();
+      cameraAnimation = null;
+      camera.updateMatrixWorld(true);
+      const step = camera.position.distanceTo(controls.target) * 0.025;
+      const pan = new THREE.Vector3().setFromMatrixColumn(camera.matrix, event.key === 'ArrowLeft' || event.key === 'ArrowRight' ? 0 : 1);
+      pan.multiplyScalar(step * (event.key === 'ArrowLeft' || event.key === 'ArrowDown' ? -1 : 1));
+      camera.position.add(pan);
+      controls.target.add(pan);
+      setPresetLabel(null);
+      controls.update();
+      requestRender();
+    }
     if (['+', '=', '-', '_'].includes(event.key)) {
       event.preventDefault();
       cameraAnimation = null;
@@ -511,12 +536,12 @@ function bindEvents() {
   });
   updateTheme();
   reducedMotion.addEventListener('change', () => {
-    controls.enableDamping = !reducedMotion.matches;
     if (reducedMotion.matches) {
       if (explosionAnimation) { applyExplosion(explosionTarget); explosionAnimation = null; }
       if (cameraAnimation) {
         camera.position.copy(cameraAnimation.to);
         controls.target.copy(cameraAnimation.toTarget);
+        camera.up.copy(cameraAnimation.fromUp).applyQuaternion(cameraAnimation.upRotation);
         cameraAnimation = null;
       }
     }
@@ -544,11 +569,12 @@ function render(now) {
     const eased = t * t * (3 - 2 * t);
     camera.position.lerpVectors(cameraAnimation.from, cameraAnimation.to, eased);
     controls.target.lerpVectors(cameraAnimation.fromTarget, cameraAnimation.toTarget, eased);
+    camera.up.copy(cameraAnimation.fromUp).applyQuaternion(new THREE.Quaternion().slerp(cameraAnimation.upRotation, eased));
     if (t === 1) cameraAnimation = null;
   }
-  const changed = controls.update();
+  controls.update();
   renderer.render(scene, camera);
-  if (changed || cameraAnimation || explosionAnimation) requestRender();
+  if (cameraAnimation || explosionAnimation) requestRender();
 }
 
 // Read-only diagnostics are available only with ?debug=1; useful after replacing a GLB.
@@ -567,6 +593,7 @@ function exposeDiagnostics() {
         ready, selected: selected?.id ?? null, explosionAmount, wireframe, currentPreset,
         animating: Boolean(cameraAnimation || explosionAnimation),
         camera: camera.position.toArray(), target: controls.target.toArray(),
+        up: camera.up.toArray(), modelRotation: model.rotation.toArray().slice(0, 3),
         direction: camera.position.clone().sub(controls.target).normalize().toArray(),
         frameCount: renderer.info.render.frame,
         allBoundsFit: corners.every(([x, y, z]) => Math.abs(x) <= 1 && Math.abs(y) <= 1 && z >= -1 && z <= 1),
@@ -593,9 +620,13 @@ function exposeDiagnostics() {
         for (let i = 0; i < positions.count; i += Math.max(1, Math.floor(positions.count / 500))) {
           const point = new THREE.Vector3().fromBufferAttribute(positions, i).applyMatrix4(mesh.matrixWorld).project(camera);
           if (Math.abs(point.x) > 0.98 || Math.abs(point.y) > 0.98) continue;
-          raycaster.setFromCamera(new THREE.Vector2(point.x, point.y), camera);
+          // Browser pointer coordinates can be rounded to CSS pixels. Validate
+          // the actual click ray instead of a vertex exactly on a silhouette.
+          const x = Math.round(rect.left + (point.x + 1) * rect.width / 2);
+          const y = Math.round(rect.top + (1 - point.y) * rect.height / 2);
+          raycaster.setFromCamera(new THREE.Vector2((x - rect.left) / rect.width * 2 - 1, 1 - (y - rect.top) / rect.height * 2), camera);
           const hit = raycaster.intersectObjects(visibleMeshes, false)[0];
-          if (hit && meshOwners.get(hit.object) === part) return { x: rect.left + (point.x + 1) * rect.width / 2, y: rect.top + (1 - point.y) * rect.height / 2 };
+          if (hit && meshOwners.get(hit.object) === part) return { x, y };
         }
       }
       return null;

@@ -1,0 +1,1075 @@
+[
+  {
+    "node": 0,
+    "name": "CAD Camera",
+    "originalName": "current camera"
+  },
+  {
+    "node": 1,
+    "name": "Device",
+    "originalName": "Holder_v7"
+  },
+  {
+    "node": 2,
+    "name": "Screw 01",
+    "originalName": "pan head cross recess screw_iso-112",
+    "mesh": 0
+  },
+  {
+    "node": 3,
+    "name": "Mic",
+    "originalName": "BY-MM1-2",
+    "mesh": 1
+  },
+  {
+    "node": 4,
+    "name": "Camera V2",
+    "originalName": "Cam V2.1 v1-1",
+    "mesh": 2
+  },
+  {
+    "node": 5,
+    "name": "Screw 02",
+    "originalName": "pan head cross recess screw_iso-124",
+    "mesh": 3
+  },
+  {
+    "node": 6,
+    "name": "Screw 03",
+    "originalName": "pan head cross recess screw_iso-126",
+    "mesh": 4
+  },
+  {
+    "node": 7,
+    "name": "Audio Jack",
+    "originalName": "Jack-1",
+    "mesh": 5
+  },
+  {
+    "node": 8,
+    "name": "IR Board",
+    "originalName": "IR_Board-1",
+    "mesh": 6
+  },
+  {
+    "node": 9,
+    "name": "Camera V3",
+    "originalName": "Camera Moudule 3 v8"
+  },
+  {
+    "node": 10,
+    "name": "Cam V3 Assembly",
+    "originalName": "Camera Moudule 3 v8.step"
+  },
+  {
+    "node": 11,
+    "name": "Cam Part 01",
+    "originalName": "Camera Moudule 3 v8.step-1/eBom-FreeParts.step-1",
+    "mesh": 7
+  },
+  {
+    "node": 12,
+    "name": "Cam Module",
+    "originalName": "Camera Moudule 3.step"
+  },
+  {
+    "node": 13,
+    "name": "Cam Rear",
+    "originalName": "Rear Components.step"
+  },
+  {
+    "node": 14,
+    "name": "Cam Rear 01",
+    "originalName": "Camera Moudule 3 v8.step-1/Camera Moudule 3.step-1/Rear Components.step-1/Rear Components-1.step-1",
+    "mesh": 8
+  },
+  {
+    "node": 15,
+    "name": "Cam Rear 02",
+    "originalName": "Camera Moudule 3 v8.step-1/Camera Moudule 3.step-1/Rear Components.step-1/Rear Components-3.step-1",
+    "mesh": 9
+  },
+  {
+    "node": 16,
+    "name": "Cam FFC Socket",
+    "originalName": "Camera Moudule 3 v8.step-1/Camera Moudule 3.step-1/Rear Components.step-1/sfw15r3ste1lf.step-1",
+    "mesh": 10
+  },
+  {
+    "node": 17,
+    "name": "Cam Rear 03",
+    "originalName": "Camera Moudule 3 v8.step-1/Camera Moudule 3.step-1/Rear Components.step-1/Rear Components-0.step-1",
+    "mesh": 11
+  },
+  {
+    "node": 18,
+    "name": "Cam Rear 04",
+    "originalName": "Camera Moudule 3 v8.step-1/Camera Moudule 3.step-1/Rear Components.step-1/Rear Components-2.step-1",
+    "mesh": 12
+  },
+  {
+    "node": 19,
+    "name": "Cam Rear 05",
+    "originalName": "Camera Moudule 3 v8.step-1/Camera Moudule 3.step-1/Rear Components.step-1/Rear Components-4.step-1",
+    "mesh": 13
+  },
+  {
+    "node": 20,
+    "name": "Cam PCB",
+    "originalName": "Camera Moudule 3 v8.step-1/Camera Moudule 3.step-1/Board.step-1",
+    "mesh": 14
+  },
+  {
+    "node": 21,
+    "name": "IMX708",
+    "originalName": "Sony IMX708.step"
+  },
+  {
+    "node": 22,
+    "name": "Cam Housing",
+    "originalName": "Camera Moudule 3 v8.step-1/Camera Moudule 3.step-1/Sony IMX708.step-1/Housing.step-1",
+    "mesh": 15
+  },
+  {
+    "node": 23,
+    "name": "Cam Sensor",
+    "originalName": "Camera Moudule 3 v8.step-1/Camera Moudule 3.step-1/Sony IMX708.step-1/Sensor.step-1",
+    "mesh": 16
+  },
+  {
+    "node": 24,
+    "name": "Cam Lens",
+    "originalName": "Camera Moudule 3 v8.step-1/Camera Moudule 3.step-1/Sony IMX708.step-1/Lens.step-1",
+    "mesh": 17
+  },
+  {
+    "node": 25,
+    "name": "Cam Ring",
+    "originalName": "Camera Moudule 3 v8.step-1/Camera Moudule 3.step-1/Sony IMX708.step-1/Ring.step-1",
+    "mesh": 18
+  },
+  {
+    "node": 26,
+    "name": "Cam Mount",
+    "originalName": "Camera Moudule 3 v8.step-1/Camera Moudule 3.step-1/Sony IMX708.step-1/Mount.step-1",
+    "mesh": 19
+  },
+  {
+    "node": 27,
+    "name": "Battery",
+    "originalName": "Battery_18Ah-1",
+    "mesh": 20
+  },
+  {
+    "node": 28,
+    "name": "DC Converter",
+    "originalName": "JACOBSPARTS-XL4015-1",
+    "mesh": 21
+  },
+  {
+    "node": 29,
+    "name": "Solar Charger",
+    "originalName": "EPRC10-ST Solar Charger"
+  },
+  {
+    "node": 30,
+    "name": "Charger Assembly",
+    "originalName": "EPRC10-ST Solar Charger.STEP"
+  },
+  {
+    "node": 31,
+    "name": "Charger Screw 01",
+    "originalName": "EPRC10-ST Solar Charger.STEP-1/EPRC10-ST screw-0.STEP-3",
+    "mesh": 22
+  },
+  {
+    "node": 32,
+    "name": "Charger Screw 02",
+    "originalName": "EPRC10-ST Solar Charger.STEP-1/EPRC10-ST screw-0.STEP-6",
+    "mesh": 23
+  },
+  {
+    "node": 33,
+    "name": "Charger Screw 03",
+    "originalName": "EPRC10-ST Solar Charger.STEP-1/EPRC10-ST screw.STEP-1",
+    "mesh": 24
+  },
+  {
+    "node": 34,
+    "name": "Charger Back",
+    "originalName": "EPRC10-ST Solar Charger.STEP-1/EPRC10-ST back plate.STEP-1",
+    "mesh": 25
+  },
+  {
+    "node": 35,
+    "name": "Charger Screw 04",
+    "originalName": "EPRC10-ST Solar Charger.STEP-1/EPRC10-ST screw-0.STEP-5",
+    "mesh": 26
+  },
+  {
+    "node": 36,
+    "name": "Charger PCB",
+    "originalName": "EPRC10-ST Solar Charger.STEP-1/EPRC10-ST pcb.STEP-1",
+    "mesh": 27
+  },
+  {
+    "node": 37,
+    "name": "Charger Case",
+    "originalName": "EPRC10-ST Solar Charger.STEP-1/EPRC10-ST case.STEP-1",
+    "mesh": 28
+  },
+  {
+    "node": 38,
+    "name": "Charger Screw 05",
+    "originalName": "EPRC10-ST Solar Charger.STEP-1/EPRC10-ST screw-0.STEP-1",
+    "mesh": 29
+  },
+  {
+    "node": 39,
+    "name": "Charger Screw 06",
+    "originalName": "EPRC10-ST Solar Charger.STEP-1/EPRC10-ST screw-0.STEP-2",
+    "mesh": 30
+  },
+  {
+    "node": 40,
+    "name": "Charger Screw 07",
+    "originalName": "EPRC10-ST Solar Charger.STEP-1/EPRC10-ST screw-0.STEP-4",
+    "mesh": 31
+  },
+  {
+    "node": 41,
+    "name": "Charger Screw 08",
+    "originalName": "EPRC10-ST Solar Charger.STEP-1/EPRC10-ST screw-0.STEP-7",
+    "mesh": 32
+  },
+  {
+    "node": 42,
+    "name": "Charger Screw 09",
+    "originalName": "EPRC10-ST Solar Charger.STEP-1/EPRC10-ST screw-0.STEP-8",
+    "mesh": 33
+  },
+  {
+    "node": 43,
+    "name": "Screw 04",
+    "originalName": "pan head cross recess screw_iso-113",
+    "mesh": 34
+  },
+  {
+    "node": 44,
+    "name": "Screw 05",
+    "originalName": "pan head cross recess screw_iso-111",
+    "mesh": 35
+  },
+  {
+    "node": 45,
+    "name": "Screw 06",
+    "originalName": "pan head cross recess screw_iso-123",
+    "mesh": 36
+  },
+  {
+    "node": 46,
+    "name": "Screw 07",
+    "originalName": "pan head cross recess screw_iso-125",
+    "mesh": 37
+  },
+  {
+    "node": 47,
+    "name": "Screw 08",
+    "originalName": "pan head cross recess screw_iso-62",
+    "mesh": 38
+  },
+  {
+    "node": 48,
+    "name": "Screw 09",
+    "originalName": "pan head cross recess screw_iso-109",
+    "mesh": 39
+  },
+  {
+    "node": 49,
+    "name": "Screw 10",
+    "originalName": "pan head cross recess screw_iso-129",
+    "mesh": 40
+  },
+  {
+    "node": 50,
+    "name": "Spacer 01",
+    "originalName": "hexagonal_spacer_MF_M2.5_H16_HEX5_FTD6_MTL6-14",
+    "mesh": 41
+  },
+  {
+    "node": 51,
+    "name": "Spacer 02",
+    "originalName": "hexagonal_spacer_MF_M2.5_H16_HEX5_FTD6_MTL6-13",
+    "mesh": 42
+  },
+  {
+    "node": 52,
+    "name": "Screw 11",
+    "originalName": "pan head cross recess screw_iso-130",
+    "mesh": 43
+  },
+  {
+    "node": 53,
+    "name": "Screw 12",
+    "originalName": "pan head cross recess screw_iso-63",
+    "mesh": 44
+  },
+  {
+    "node": 54,
+    "name": "Screw 13",
+    "originalName": "pan head cross recess screw_iso-128",
+    "mesh": 45
+  },
+  {
+    "node": 55,
+    "name": "Screw 14",
+    "originalName": "pan head cross recess screw_iso-127",
+    "mesh": 46
+  },
+  {
+    "node": 56,
+    "name": "Screw 15",
+    "originalName": "pan head cross recess screw_iso-108",
+    "mesh": 47
+  },
+  {
+    "node": 57,
+    "name": "Screw 16",
+    "originalName": "pan head cross recess screw_iso-110",
+    "mesh": 48
+  },
+  {
+    "node": 58,
+    "name": "Spacer 03",
+    "originalName": "hexagonal_spacer_MF_M2.5_H16_HEX5_FTD6_MTL6-12",
+    "mesh": 49
+  },
+  {
+    "node": 59,
+    "name": "Spacer 04",
+    "originalName": "hexagonal_spacer_MF_M2.5_H16_HEX5_FTD6_MTL6-15",
+    "mesh": 50
+  },
+  {
+    "node": 60,
+    "name": "Screw 17",
+    "originalName": "pan head cross recess screw_iso-25",
+    "mesh": 51
+  },
+  {
+    "node": 61,
+    "name": "Screw 18",
+    "originalName": "pan head cross recess screw_iso-10",
+    "mesh": 52
+  },
+  {
+    "node": 62,
+    "name": "Screw 19",
+    "originalName": "pan head cross recess screw_iso-12",
+    "mesh": 53
+  },
+  {
+    "node": 63,
+    "name": "Screw 20",
+    "originalName": "pan head cross recess screw_iso-13",
+    "mesh": 54
+  },
+  {
+    "node": 64,
+    "name": "Screw 21",
+    "originalName": "pan head cross recess screw_iso-11",
+    "mesh": 55
+  },
+  {
+    "node": 65,
+    "name": "Screw 22",
+    "originalName": "pan head cross recess screw_iso-26",
+    "mesh": 56
+  },
+  {
+    "node": 66,
+    "name": "Screw 23",
+    "originalName": "pan head cross recess screw_iso-17",
+    "mesh": 57
+  },
+  {
+    "node": 67,
+    "name": "Screw 24",
+    "originalName": "pan head cross recess screw_iso-90",
+    "mesh": 58
+  },
+  {
+    "node": 68,
+    "name": "Case Connector",
+    "originalName": "Casing_Connector_M4_v7-3",
+    "mesh": 59
+  },
+  {
+    "node": 69,
+    "name": "Gasket",
+    "originalName": "Casing_Gasket_v6-1",
+    "mesh": 60
+  },
+  {
+    "node": 70,
+    "name": "Screw 25",
+    "originalName": "pan head cross recess screw_iso-89",
+    "mesh": 61
+  },
+  {
+    "node": 71,
+    "name": "Holder",
+    "originalName": "Holder_v7-1",
+    "mesh": 62
+  },
+  {
+    "node": 72,
+    "name": "Case Cover",
+    "originalName": "Casing Cover_v7-1",
+    "mesh": 63
+  },
+  {
+    "node": 73,
+    "name": "Cable Gland",
+    "originalName": "CABLE GLAND 6-12MM M20 POLYAMIDE-1",
+    "mesh": 64
+  },
+  {
+    "node": 74,
+    "name": "Screw 26",
+    "originalName": "pan head cross recess screw_iso-27",
+    "mesh": 65
+  },
+  {
+    "node": 75,
+    "name": "Screw 27",
+    "originalName": "pan head cross recess screw_iso-28",
+    "mesh": 66
+  },
+  {
+    "node": 76,
+    "name": "Screw 28",
+    "originalName": "pan head cross recess screw_iso-18",
+    "mesh": 67
+  },
+  {
+    "node": 77,
+    "name": "Outer Case",
+    "originalName": "Outer Case_v5-1",
+    "mesh": 68
+  },
+  {
+    "node": 78,
+    "name": "Mic Hood",
+    "originalName": "MicRainCover-1",
+    "mesh": 69
+  },
+  {
+    "node": 79,
+    "name": "Case Fan Assembly",
+    "originalName": "Fan"
+  },
+  {
+    "node": 80,
+    "name": "Fan Nut",
+    "originalName": "Nut-1",
+    "mesh": 70
+  },
+  {
+    "node": 81,
+    "name": "Case Fan",
+    "originalName": "EF80251S1-1000U-A99-1",
+    "mesh": 71
+  },
+  {
+    "node": 82,
+    "name": "Vent 01",
+    "originalName": "Vent-1",
+    "mesh": 72
+  },
+  {
+    "node": 83,
+    "name": "Pi 5",
+    "originalName": "RASPBERRY_PI_5"
+  },
+  {
+    "node": 84,
+    "name": "Pi PCB",
+    "originalName": "PLATE_RASPBERRY_PI_5-2",
+    "mesh": 73
+  },
+  {
+    "node": 85,
+    "name": "Pi Shield",
+    "originalName": "METAL_PLATE.-1",
+    "mesh": 74
+  },
+  {
+    "node": 86,
+    "name": "Ethernet Port",
+    "originalName": "GIGABIT_ETHERNET_PORT-1",
+    "mesh": 75
+  },
+  {
+    "node": 87,
+    "name": "USB 3 Ports",
+    "originalName": "2xUSB_3.0_PORT-1",
+    "mesh": 76
+  },
+  {
+    "node": 88,
+    "name": "USB 2 Ports",
+    "originalName": "2xUSB_2.0_PORT-1",
+    "mesh": 77
+  },
+  {
+    "node": 89,
+    "name": "HDMI 01",
+    "originalName": "FEMALE_MICRO_HDMI_CONNECTOR-1",
+    "mesh": 78
+  },
+  {
+    "node": 90,
+    "name": "Pi Part 01",
+    "originalName": "STOCK_3-1",
+    "mesh": 79
+  },
+  {
+    "node": 91,
+    "name": "Pi Part 02",
+    "originalName": "STOCK_1-1",
+    "mesh": 80
+  },
+  {
+    "node": 92,
+    "name": "Pi Header 01",
+    "originalName": "3.0_PIN_HEADER_10-1",
+    "mesh": 81
+  },
+  {
+    "node": 93,
+    "name": "Pi Header 02",
+    "originalName": "2.0_PIN_HEADER-1",
+    "mesh": 82
+  },
+  {
+    "node": 94,
+    "name": "Pi Part 03",
+    "originalName": "STOCK_2-1",
+    "mesh": 83
+  },
+  {
+    "node": 95,
+    "name": "HDMI 02",
+    "originalName": "FEMALE_MICRO_HDMI_CONNECTOR-2",
+    "mesh": 84
+  },
+  {
+    "node": 96,
+    "name": "Broadcom IC",
+    "originalName": "BROADCOM_1-1",
+    "mesh": 85
+  },
+  {
+    "node": 97,
+    "name": "USB Socket",
+    "originalName": "FEMALE_USB_CONNECTOR-1",
+    "mesh": 86
+  },
+  {
+    "node": 98,
+    "name": "Pi Connector",
+    "originalName": "CONNECT_V1-1",
+    "mesh": 87
+  },
+  {
+    "node": 99,
+    "name": "D9WHV IC",
+    "originalName": "9FD77_D9WHV-1",
+    "mesh": 88
+  },
+  {
+    "node": 100,
+    "name": "Cam Display 01",
+    "originalName": "CAMERA_DISPLAY_1-3",
+    "mesh": 89
+  },
+  {
+    "node": 101,
+    "name": "MxL IC",
+    "originalName": "MxL-1",
+    "mesh": 90
+  },
+  {
+    "node": 102,
+    "name": "Cam Display 02",
+    "originalName": "CAMERA_DISPLAY_2-1",
+    "mesh": 91
+  },
+  {
+    "node": 103,
+    "name": "RP1 IC",
+    "originalName": "RP1_CO_CONTROLLER-1",
+    "mesh": 92
+  },
+  {
+    "node": 104,
+    "name": "SD Assembly",
+    "originalName": "SLOT_CARD_ASM"
+  },
+  {
+    "node": 105,
+    "name": "SD Card",
+    "originalName": "SLOT_CARD_ASM-1/SD_CARD_V1-1",
+    "mesh": 93
+  },
+  {
+    "node": 106,
+    "name": "SD Contacts",
+    "originalName": "SLOT_CARD_ASM-1/CARD_SLOT_METAL_PIN-1",
+    "mesh": 94
+  },
+  {
+    "node": 107,
+    "name": "SD Part 01",
+    "originalName": "SLOT_CARD_ASM-1/PART3_V1-1",
+    "mesh": 95
+  },
+  {
+    "node": 108,
+    "name": "Ethernet IC",
+    "originalName": "GIGABIT_ETHERNET_TRANSCEIVER-1",
+    "mesh": 96
+  },
+  {
+    "node": 109,
+    "name": "Pi Button 01",
+    "originalName": "BUTTON_MINI-1",
+    "mesh": 97
+  },
+  {
+    "node": 110,
+    "name": "Pi Button 02",
+    "originalName": "BUTTON_2-1",
+    "mesh": 98
+  },
+  {
+    "node": 111,
+    "name": "Cam Display 03",
+    "originalName": "CAMERA_DISPLAY_2-2",
+    "mesh": 91
+  },
+  {
+    "node": 112,
+    "name": "Case Nut",
+    "originalName": "Nut-1",
+    "mesh": 99
+  },
+  {
+    "node": 113,
+    "name": "SSD HAT",
+    "originalName": "PCIe to M.2 HAT w SSD"
+  },
+  {
+    "node": 114,
+    "name": "HAT Assembly",
+    "originalName": "Waveshare PCIe to M.2 HAT Model inc SSD.step"
+  },
+  {
+    "node": 115,
+    "name": "HAT Board",
+    "originalName": "Waveshare PCIe HAT v17.step"
+  },
+  {
+    "node": 116,
+    "name": "M2 Socket",
+    "originalName": "Waveshare PCIe to M.2 HAT Model inc SSD.step-1/Waveshare PCIe HAT v17.step-1/M.2 Connector.step-1",
+    "mesh": 100
+  },
+  {
+    "node": 117,
+    "name": "HAT PCB",
+    "originalName": "Waveshare PCIe to M.2 HAT Model inc SSD.step-1/Waveshare PCIe HAT v17.step-1/PCIe M.2 HAT Model.step-1",
+    "mesh": 101
+  },
+  {
+    "node": 118,
+    "name": "PCIe Socket",
+    "originalName": "Waveshare PCIe to M.2 HAT Model inc SSD.step-1/Waveshare PCIe HAT v17.step-1/PCIe connector.step-1",
+    "mesh": 102
+  },
+  {
+    "node": 119,
+    "name": "HAT ICs",
+    "originalName": "Waveshare PCIe to M.2 HAT Model inc SSD.step-1/Waveshare PCIe HAT v17.step-1/Misc IC's.step-1",
+    "mesh": 103
+  },
+  {
+    "node": 120,
+    "name": "NVMe SSD",
+    "originalName": "Waveshare PCIe to M.2 HAT Model inc SSD.step-1/Waveshare PCIe HAT v17.step-1/2242 NVMe.step-1",
+    "mesh": 104
+  },
+  {
+    "node": 121,
+    "name": "HAT Part 01",
+    "originalName": "Waveshare PCIe to M.2 HAT Model inc SSD.step-1/Waveshare PCIe HAT v17.step-1/Waveshare PCIe HAT v17-0.step-1",
+    "mesh": 105
+  },
+  {
+    "node": 122,
+    "name": "HAT Part 02",
+    "originalName": "Waveshare PCIe to M.2 HAT Model inc SSD.step-1/Waveshare PCIe HAT v17.step-1/Waveshare PCIe HAT v17-5.step-1",
+    "mesh": 106
+  },
+  {
+    "node": 123,
+    "name": "HAT Part 03",
+    "originalName": "Waveshare PCIe to M.2 HAT Model inc SSD.step-1/Waveshare PCIe HAT v17.step-1/Waveshare PCIe HAT v17-2.step-1",
+    "mesh": 107
+  },
+  {
+    "node": 124,
+    "name": "HAT Part 04",
+    "originalName": "Waveshare PCIe to M.2 HAT Model inc SSD.step-1/Waveshare PCIe HAT v17.step-1/Waveshare PCIe HAT v17-1.step-1",
+    "mesh": 108
+  },
+  {
+    "node": 125,
+    "name": "HAT Part 05",
+    "originalName": "Waveshare PCIe to M.2 HAT Model inc SSD.step-1/Waveshare PCIe HAT v17.step-1/Waveshare PCIe HAT v17-4.step-1",
+    "mesh": 109
+  },
+  {
+    "node": 126,
+    "name": "HAT Part 06",
+    "originalName": "Waveshare PCIe to M.2 HAT Model inc SSD.step-1/Waveshare PCIe HAT v17.step-1/Waveshare PCIe HAT v17-3.step-1",
+    "mesh": 110
+  },
+  {
+    "node": 127,
+    "name": "HAT Part 07",
+    "originalName": "Waveshare PCIe to M.2 HAT Model inc SSD.step-1/Waveshare PCIe HAT v17.step-1/Waveshare PCIe HAT v17-6.step-1",
+    "mesh": 111
+  },
+  {
+    "node": 128,
+    "name": "HAT Part 08",
+    "originalName": "Waveshare PCIe to M.2 HAT Model inc SSD.step-1/Waveshare PCIe HAT v17.step-1/Waveshare PCIe HAT v17-12.step-1",
+    "mesh": 112
+  },
+  {
+    "node": 129,
+    "name": "HAT Part 09",
+    "originalName": "Waveshare PCIe to M.2 HAT Model inc SSD.step-1/Waveshare PCIe HAT v17.step-1/Waveshare PCIe HAT v17-10.step-1",
+    "mesh": 113
+  },
+  {
+    "node": 130,
+    "name": "HAT Part 10",
+    "originalName": "Waveshare PCIe to M.2 HAT Model inc SSD.step-1/Waveshare PCIe HAT v17.step-1/Waveshare PCIe HAT v17-11.step-1",
+    "mesh": 114
+  },
+  {
+    "node": 131,
+    "name": "HAT Part 11",
+    "originalName": "Waveshare PCIe to M.2 HAT Model inc SSD.step-1/Waveshare PCIe HAT v17.step-1/Waveshare PCIe HAT v17-17.step-1",
+    "mesh": 115
+  },
+  {
+    "node": 132,
+    "name": "HAT Part 12",
+    "originalName": "Waveshare PCIe to M.2 HAT Model inc SSD.step-1/Waveshare PCIe HAT v17.step-1/Waveshare PCIe HAT v17-14.step-1",
+    "mesh": 116
+  },
+  {
+    "node": 133,
+    "name": "HAT Part 13",
+    "originalName": "Waveshare PCIe to M.2 HAT Model inc SSD.step-1/Waveshare PCIe HAT v17.step-1/Waveshare PCIe HAT v17-15.step-1",
+    "mesh": 117
+  },
+  {
+    "node": 134,
+    "name": "HAT Part 14",
+    "originalName": "Waveshare PCIe to M.2 HAT Model inc SSD.step-1/Waveshare PCIe HAT v17.step-1/Waveshare PCIe HAT v17-16.step-1",
+    "mesh": 118
+  },
+  {
+    "node": 135,
+    "name": "HAT Part 15",
+    "originalName": "Waveshare PCIe to M.2 HAT Model inc SSD.step-1/Waveshare PCIe HAT v17.step-1/Waveshare PCIe HAT v17-21.step-1",
+    "mesh": 119
+  },
+  {
+    "node": 136,
+    "name": "HAT Part 16",
+    "originalName": "Waveshare PCIe to M.2 HAT Model inc SSD.step-1/Waveshare PCIe HAT v17.step-1/Waveshare PCIe HAT v17-7.step-1",
+    "mesh": 120
+  },
+  {
+    "node": 137,
+    "name": "HAT Part 17",
+    "originalName": "Waveshare PCIe to M.2 HAT Model inc SSD.step-1/Waveshare PCIe HAT v17.step-1/Waveshare PCIe HAT v17-8.step-1",
+    "mesh": 121
+  },
+  {
+    "node": 138,
+    "name": "HAT Part 18",
+    "originalName": "Waveshare PCIe to M.2 HAT Model inc SSD.step-1/Waveshare PCIe HAT v17.step-1/Waveshare PCIe HAT v17-9.step-1",
+    "mesh": 122
+  },
+  {
+    "node": 139,
+    "name": "HAT Part 19",
+    "originalName": "Waveshare PCIe to M.2 HAT Model inc SSD.step-1/Waveshare PCIe HAT v17.step-1/Waveshare PCIe HAT v17-13.step-1",
+    "mesh": 123
+  },
+  {
+    "node": 140,
+    "name": "HAT Part 20",
+    "originalName": "Waveshare PCIe to M.2 HAT Model inc SSD.step-1/Waveshare PCIe HAT v17.step-1/Waveshare PCIe HAT v17-18.step-1",
+    "mesh": 124
+  },
+  {
+    "node": 141,
+    "name": "HAT Part 21",
+    "originalName": "Waveshare PCIe to M.2 HAT Model inc SSD.step-1/Waveshare PCIe HAT v17.step-1/Waveshare PCIe HAT v17-29.step-1",
+    "mesh": 125
+  },
+  {
+    "node": 142,
+    "name": "HAT Part 22",
+    "originalName": "Waveshare PCIe to M.2 HAT Model inc SSD.step-1/Waveshare PCIe HAT v17.step-1/Waveshare PCIe HAT v17-20.step-1",
+    "mesh": 126
+  },
+  {
+    "node": 143,
+    "name": "HAT Part 23",
+    "originalName": "Waveshare PCIe to M.2 HAT Model inc SSD.step-1/Waveshare PCIe HAT v17.step-1/Waveshare PCIe HAT v17-23.step-1",
+    "mesh": 127
+  },
+  {
+    "node": 144,
+    "name": "HAT Part 24",
+    "originalName": "Waveshare PCIe to M.2 HAT Model inc SSD.step-1/Waveshare PCIe HAT v17.step-1/Waveshare PCIe HAT v17-33.step-1",
+    "mesh": 128
+  },
+  {
+    "node": 145,
+    "name": "HAT Part 25",
+    "originalName": "Waveshare PCIe to M.2 HAT Model inc SSD.step-1/Waveshare PCIe HAT v17.step-1/Waveshare PCIe HAT v17-19.step-1",
+    "mesh": 129
+  },
+  {
+    "node": 146,
+    "name": "HAT Part 26",
+    "originalName": "Waveshare PCIe to M.2 HAT Model inc SSD.step-1/Waveshare PCIe HAT v17.step-1/Waveshare PCIe HAT v17-22.step-1",
+    "mesh": 130
+  },
+  {
+    "node": 147,
+    "name": "HAT Part 27",
+    "originalName": "Waveshare PCIe to M.2 HAT Model inc SSD.step-1/Waveshare PCIe HAT v17.step-1/Waveshare PCIe HAT v17-24.step-1",
+    "mesh": 131
+  },
+  {
+    "node": 148,
+    "name": "HAT Part 28",
+    "originalName": "Waveshare PCIe to M.2 HAT Model inc SSD.step-1/Waveshare PCIe HAT v17.step-1/Waveshare PCIe HAT v17-25.step-1",
+    "mesh": 132
+  },
+  {
+    "node": 149,
+    "name": "HAT Part 29",
+    "originalName": "Waveshare PCIe to M.2 HAT Model inc SSD.step-1/Waveshare PCIe HAT v17.step-1/Waveshare PCIe HAT v17-26.step-1",
+    "mesh": 133
+  },
+  {
+    "node": 150,
+    "name": "HAT Part 30",
+    "originalName": "Waveshare PCIe to M.2 HAT Model inc SSD.step-1/Waveshare PCIe HAT v17.step-1/Waveshare PCIe HAT v17-27.step-1",
+    "mesh": 134
+  },
+  {
+    "node": 151,
+    "name": "HAT Part 31",
+    "originalName": "Waveshare PCIe to M.2 HAT Model inc SSD.step-1/Waveshare PCIe HAT v17.step-1/Waveshare PCIe HAT v17-28.step-1",
+    "mesh": 135
+  },
+  {
+    "node": 152,
+    "name": "HAT Part 32",
+    "originalName": "Waveshare PCIe to M.2 HAT Model inc SSD.step-1/Waveshare PCIe HAT v17.step-1/Waveshare PCIe HAT v17-30.step-1",
+    "mesh": 136
+  },
+  {
+    "node": 153,
+    "name": "HAT Part 33",
+    "originalName": "Waveshare PCIe to M.2 HAT Model inc SSD.step-1/Waveshare PCIe HAT v17.step-1/Waveshare PCIe HAT v17-31.step-1",
+    "mesh": 137
+  },
+  {
+    "node": 154,
+    "name": "HAT Part 34",
+    "originalName": "Waveshare PCIe to M.2 HAT Model inc SSD.step-1/Waveshare PCIe HAT v17.step-1/Waveshare PCIe HAT v17-32.step-1",
+    "mesh": 138
+  },
+  {
+    "node": 155,
+    "name": "HAT Part 35",
+    "originalName": "Waveshare PCIe to M.2 HAT Model inc SSD.step-1/Waveshare PCIe HAT v17.step-1/Waveshare PCIe HAT v17-41.step-1",
+    "mesh": 139
+  },
+  {
+    "node": 156,
+    "name": "HAT Part 36",
+    "originalName": "Waveshare PCIe to M.2 HAT Model inc SSD.step-1/Waveshare PCIe HAT v17.step-1/Waveshare PCIe HAT v17-34.step-1",
+    "mesh": 140
+  },
+  {
+    "node": 157,
+    "name": "HAT Part 37",
+    "originalName": "Waveshare PCIe to M.2 HAT Model inc SSD.step-1/Waveshare PCIe HAT v17.step-1/Waveshare PCIe HAT v17-35.step-1",
+    "mesh": 141
+  },
+  {
+    "node": 158,
+    "name": "HAT Part 38",
+    "originalName": "Waveshare PCIe to M.2 HAT Model inc SSD.step-1/Waveshare PCIe HAT v17.step-1/Waveshare PCIe HAT v17-37.step-1",
+    "mesh": 142
+  },
+  {
+    "node": 159,
+    "name": "HAT Part 39",
+    "originalName": "Waveshare PCIe to M.2 HAT Model inc SSD.step-1/Waveshare PCIe HAT v17.step-1/Waveshare PCIe HAT v17-36.step-1",
+    "mesh": 143
+  },
+  {
+    "node": 160,
+    "name": "HAT Part 40",
+    "originalName": "Waveshare PCIe to M.2 HAT Model inc SSD.step-1/Waveshare PCIe HAT v17.step-1/Waveshare PCIe HAT v17-39.step-1",
+    "mesh": 144
+  },
+  {
+    "node": 161,
+    "name": "HAT Part 41",
+    "originalName": "Waveshare PCIe to M.2 HAT Model inc SSD.step-1/Waveshare PCIe HAT v17.step-1/Waveshare PCIe HAT v17-40.step-1",
+    "mesh": 145
+  },
+  {
+    "node": 162,
+    "name": "HAT Part 42",
+    "originalName": "Waveshare PCIe to M.2 HAT Model inc SSD.step-1/Waveshare PCIe HAT v17.step-1/Waveshare PCIe HAT v17-38.step-1",
+    "mesh": 146
+  },
+  {
+    "node": 163,
+    "name": "Pi Cooler",
+    "originalName": "Heatsink+fan RPi-5"
+  },
+  {
+    "node": 164,
+    "name": "Spring Bolt 01",
+    "originalName": "Spring-bolt"
+  },
+  {
+    "node": 165,
+    "name": "Spring 01",
+    "originalName": "Spring-bolt-2/Spring-1",
+    "mesh": 147
+  },
+  {
+    "node": 166,
+    "name": "Bolt 01",
+    "originalName": "Spring-bolt-2/Bolt-1",
+    "mesh": 148
+  },
+  {
+    "node": 167,
+    "name": "Heatsink",
+    "originalName": "Heatsink-fan-base_RPi5-1",
+    "mesh": 149
+  },
+  {
+    "node": 168,
+    "name": "Cooler Fan",
+    "originalName": "final_assembly"
+  },
+  {
+    "node": 169,
+    "name": "Fan Rotor",
+    "originalName": "final_assembly-1/RotorBlades-1",
+    "mesh": 150
+  },
+  {
+    "node": 170,
+    "name": "Fan Motor",
+    "originalName": "final_assembly-1/MotorHouse-3",
+    "mesh": 151
+  },
+  {
+    "node": 171,
+    "name": "Fan Cover",
+    "originalName": "fan cover-1",
+    "mesh": 152
+  },
+  {
+    "node": 172,
+    "name": "Spring Bolt 02",
+    "originalName": "Spring-bolt"
+  },
+  {
+    "node": 173,
+    "name": "Spring 02",
+    "originalName": "Spring-bolt-1/Spring-1",
+    "mesh": 153
+  },
+  {
+    "node": 174,
+    "name": "Bolt 02",
+    "originalName": "Spring-bolt-1/Bolt-1",
+    "mesh": 154
+  },
+  {
+    "node": 175,
+    "name": "Washer 01",
+    "originalName": "plain washer small grade a_din-2",
+    "mesh": 155
+  },
+  {
+    "node": 176,
+    "name": "Screw 29",
+    "originalName": "pan head cross recess screw_din-4",
+    "mesh": 156
+  },
+  {
+    "node": 177,
+    "name": "Washer 02",
+    "originalName": "plain washer small grade a_din-3",
+    "mesh": 157
+  },
+  {
+    "node": 178,
+    "name": "Screw 30",
+    "originalName": "pan head cross recess screw_din-3",
+    "mesh": 158
+  },
+  {
+    "node": 179,
+    "name": "Washer 03",
+    "originalName": "plain washer small grade a_din-1",
+    "mesh": 159
+  },
+  {
+    "node": 180,
+    "name": "Screw 31",
+    "originalName": "pan head cross recess screw_din-2",
+    "mesh": 160
+  },
+  {
+    "node": 181,
+    "name": "Vent 02",
+    "originalName": "Vent-2",
+    "mesh": 161
+  }
+]

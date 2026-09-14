@@ -49,10 +49,18 @@ if (!process.argv.includes('--serve')) {
     const settled = () => page.waitForFunction(() => !viewerDebug.snapshot().animating);
     const click = async selector => { await page.locator(selector).click(); await settled(); };
     let state = await snapshot();
-    assert.equal(state.components.length, 13);
+    assert.equal(state.components.length, 163);
+    assert.equal(new Set(state.components.map(part => part.name)).size, 163);
+    assert(state.components.every(part => part.name.length <= 22 && !part.name.includes('.step')));
+    assert(Math.abs(state.modelRotation[2] - Math.PI) < 1e-10);
+    const modelBytes = await readFile(modelPath);
+    const modelJson = JSON.parse(modelBytes.subarray(20, 20 + modelBytes.readUInt32LE(12)).toString());
+    assert.equal(new Set(modelJson.nodes.map(node => node.name)).size, 182);
+    assert(modelJson.nodes.every(node => node.name.length <= 22 && node.extras.originalName));
+    assert(modelJson.meshes.every(mesh => mesh.name && mesh.name.length <= 22));
     assert(state.allBoundsFit);
     await page.screenshot({ path: join(output, 'desktop.png'), fullPage: true });
-    console.log('PASS: GLB load, 13 components, initial bounds fit');
+    console.log('PASS: GLB load, 163 parts, all node/mesh short names, upright correction, initial bounds fit');
 
     for (const [name, direction] of Object.entries({ ISO: [1, 0.8, 1], FRONT: [0, 0, 1], TOP: [0, 1, 0], RIGHT: [1, 0, 0] })) {
       await click(`[data-view="${name}"]`);
@@ -83,6 +91,36 @@ if (!process.argv.includes('--serve')) {
     assert.notDeepEqual((await snapshot()).target, zoomed.target);
     await click('#reset');
     console.log('PASS: four presets, rotate, wheel zoom, right-drag pan');
+
+    // Real pointer drags through both poles, a full turn, then a reverse turn.
+    await click('[data-view="FRONT"]');
+    const pitchStart = await snapshot();
+    for (const sign of [1, -1]) {
+      for (let step = 1; step <= 24; step++) {
+        await page.mouse.move(center.x, center.y);
+        await page.mouse.down();
+        await page.mouse.move(center.x, center.y + sign * box.width * Math.PI / 48, { steps: 4 });
+        await page.waitForTimeout(25);
+        await page.mouse.up();
+        state = await snapshot();
+        if (step === 6 || step === 18) assert(Math.abs(state.direction[1]) > 0.99, 'Cross each pitch pole');
+        if (step === 12) {
+          assert(state.direction[2] < -0.99, 'Continue behind the model');
+          assert(state.up[1] < -0.99, 'Camera up follows rotation through the pole');
+          // Fitting an exploded assembly must preserve the current roll.
+          await click('#explode');
+          assert((await snapshot()).up[1] < -0.99);
+          await click('#assemble');
+        }
+      }
+      state = await snapshot();
+      assert(state.direction.every((value, i) => Math.abs(value - pitchStart.direction[i]) < 0.025), 'Complete 360-degree pitch');
+      assert(state.up[1] > 0.99);
+    }
+    await drag('left', 110, 75);
+    await click('#reset');
+    assert((await snapshot()).up.every((value, i) => Math.abs(value - [0, 1, 0][i]) < 1e-10));
+    console.log('PASS: full forward/reverse 360-degree pitch, both poles, inverted explosion fit, upright reset');
 
     async function pickVisiblePart() {
       const point = await page.evaluate(() => {
