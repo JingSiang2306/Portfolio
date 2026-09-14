@@ -293,8 +293,6 @@
 
   .project-playground{ position:relative; display:inline-block; }
   .project-viewer{ display:table; margin-top:12px; }
-  .btn-viewer{ color:var(--teal); border:1px solid var(--teal); background:var(--navy-panel); }
-  .btn-viewer:hover{ color:var(--paper); background:var(--navy-panel-2); }
   html[data-theme="light"] .project-playground .btn-primary:hover{ background:#963D0C; }
   .playground-tooltip{
     position:absolute; top:calc(100% + 8px); left:0; z-index:5;

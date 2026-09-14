@@ -190,7 +190,7 @@ if (!process.argv.includes('--serve')) {
     // Follow the actual portfolio link and verify its target and tooltip.
     await page.setViewportSize({ width: 1440, height: 1100 });
     await page.goto(origin + '/');
-    const link = page.getByRole('link', { name: '3D Viewer ↗' });
+    const link = page.getByRole('link', { name: '3D Viewer →' });
     assert.equal(await link.getAttribute('target'), '_blank');
     assert.equal(await link.getAttribute('rel'), 'noopener noreferrer');
     await link.focus();
