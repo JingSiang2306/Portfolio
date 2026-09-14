@@ -1,4 +1,4 @@
-// Development only: node viewer01/verify.mjs [--serve]
+// Development only: node viewer02/verify.mjs [--serve]
 // Install playwright-core outside the website and set PLAYWRIGHT_MODULE to its
 // index.mjs, plus CHROME_PATH if Chrome is not in the usual Windows location.
 import assert from 'node:assert/strict';
@@ -21,7 +21,7 @@ const server = createServer(async (request, response) => {
     response.end(body);
   } catch { response.writeHead(404).end('Not found'); }
 });
-await new Promise(resolve => server.listen(process.argv.includes('--serve') ? 4173 : 0, '127.0.0.1', resolve));
+await new Promise(resolve => server.listen(process.argv.includes('--serve') ? 4174 : 0, '127.0.0.1', resolve));
 const origin = `http://127.0.0.1:${server.address().port}`;
 console.log('Static preview:', origin);
 
@@ -30,7 +30,7 @@ if (!process.argv.includes('--serve')) {
   const output = process.env.VIEWER_TEST_OUTPUT || await mkdtemp(join(tmpdir(), 'portfolio-viewer-check-'));
   await mkdir(output, { recursive: true });
   console.log('Evidence:', output);
-  const modelPath = join(root, 'viewer01/models/Holder_v7.glb');
+  const modelPath = join(root, 'viewer02/models/Device.glb');
   const digest = async () => createHash('sha256').update(await readFile(modelPath)).digest('hex');
   const beforeHash = await digest();
   const browser = await chromium.launch({ executablePath: process.env.CHROME_PATH || 'C:/Program Files/Google/Chrome/Application/chrome.exe', headless: true });
@@ -42,25 +42,26 @@ if (!process.argv.includes('--serve')) {
     page.on('pageerror', error => errors.push(error.message));
     page.on('request', request => { if (request.url().endsWith('.glb')) downloads.push(request.url()); });
     page.on('console', message => { if (message.type() === 'error') console.log('Console error:', message.text()); });
-    await page.goto(origin + '/viewer01/?debug=1');
+    await page.goto(origin + '/viewer02/?debug=1');
     await page.waitForFunction(() => document.querySelector('#status').dataset.state !== 'loading', { timeout: 90000 });
     assert.equal(await page.locator('#status').innerText(), 'Assembly ready');
     const snapshot = () => page.evaluate(() => viewerDebug.snapshot());
     const settled = () => page.waitForFunction(() => !viewerDebug.snapshot().animating);
     const click = async selector => { await page.locator(selector).click(); await settled(); };
     let state = await snapshot();
-    assert.equal(state.components.length, 163);
-    assert.equal(new Set(state.components.map(part => part.name)).size, 163);
+    assert.equal(state.components.length, 26);
+    assert.equal(new Set(state.components.map(part => part.name)).size, 26);
     assert(state.components.every(part => part.name.length <= 22 && !part.name.includes('.step')));
-    assert(Math.abs(state.modelRotation[2] - Math.PI) < 1e-10);
+    assert(Math.abs(state.modelRotation[2]) < 1e-10);
     const modelBytes = await readFile(modelPath);
     const modelJson = JSON.parse(modelBytes.subarray(20, 20 + modelBytes.readUInt32LE(12)).toString());
-    assert.equal(new Set(modelJson.nodes.map(node => node.name)).size, 182);
-    assert(modelJson.nodes.every(node => node.name.length <= 22 && node.extras.originalName));
-    assert(modelJson.meshes.every(mesh => mesh.name && mesh.name.length <= 22));
+    assert.equal(modelJson.nodes.length, 30);
+    assert.equal(modelJson.meshes.length, 26);
+    assert.equal(modelJson.materials.length, 33);
+    assert.equal(beforeHash, '6e30e3daae20ab7c31fdea8b271039b3d33fc52bf34b8c1efb18746e3f9730f9');
     assert(state.allBoundsFit);
     await page.screenshot({ path: join(output, 'desktop.png'), fullPage: true });
-    console.log('PASS: GLB load, 163 parts, all node/mesh short names, upright correction, initial bounds fit');
+    console.log('PASS: GLB load, 26 parts, short display names, source orientation, initial bounds fit');
 
     for (const [name, direction] of Object.entries({ ISO: [1, 0.8, 1], FRONT: [0, 0, 1], TOP: [0, 1, 0], RIGHT: [1, 0, 0] })) {
       await click(`[data-view="${name}"]`);
@@ -228,19 +229,19 @@ if (!process.argv.includes('--serve')) {
     // Follow the actual portfolio link and verify its target and tooltip.
     await page.setViewportSize({ width: 1440, height: 1100 });
     await page.goto(origin + '/');
-    const link = page.locator('a[href="viewer01/"]');
+    const link = page.locator('a[href="viewer02/"]');
     assert.equal(await link.getAttribute('target'), null);
     await link.focus();
-    assert(await page.locator('#viewerHint').isVisible());
+    assert(await page.locator('#viewer02Hint').isVisible());
     await link.click();
     await page.waitForFunction(() => document.querySelector('#status')?.dataset.state === 'ready');
-    assert(page.url().endsWith('/viewer01/'));
+    assert(page.url().endsWith('/viewer02/'));
     console.log('PASS: portfolio button, keyboard tooltip, opens working viewer in the same tab');
 
     // Mobile touch input via Chromium's touch event pipeline.
     const mobile = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true, deviceScaleFactor: 2 });
     const touchPage = await mobile.newPage();
-    await touchPage.goto(origin + '/viewer01/?debug=1');
+    await touchPage.goto(origin + '/viewer02/?debug=1');
     await touchPage.waitForFunction(() => window.viewerDebug?.snapshot().ready);
     const cdp = await mobile.newCDPSession(touchPage);
     const touchBox = await touchPage.locator('canvas').boundingBox();
@@ -265,15 +266,15 @@ if (!process.argv.includes('--serve')) {
     await mobile.close();
 
     const failure = await context.newPage();
-    await failure.route('**/models/Holder_v7.glb', route => route.fulfill({ status: 404, body: 'missing' }));
-    await failure.goto(origin + '/viewer01/');
+    await failure.route('**/models/Device.glb', route => route.fulfill({ status: 404, body: 'missing' }));
+    await failure.goto(origin + '/viewer02/');
     await failure.waitForFunction(() => document.querySelector('#status').dataset.state === 'error');
     assert.equal(await failure.locator('#status').innerText(), 'The 3D assembly could not be loaded.');
     assert(await failure.locator('#reset').isDisabled());
     await failure.close();
     console.log('PASS: clean missing-model failure');
     const fixturePage = await context.newPage();
-    await fixturePage.goto(origin + '/viewer01/?debug=1');
+    await fixturePage.goto(origin + '/viewer02/?debug=1');
     await fixturePage.waitForFunction(() => window.viewerDebug?.snapshot().ready);
     // Build an unrelated synthetic test assembly in memory. Never alter the CAD GLB.
     const fixture = await fixturePage.evaluate(async () => {
@@ -302,7 +303,7 @@ if (!process.argv.includes('--serve')) {
       }
       return Array.from(new Uint8Array(await new GLTFExporter().parseAsync(root, { binary: true })));
     });
-    await fixturePage.route('**/models/Holder_v7.glb', route => route.fulfill({ contentType: 'model/gltf-binary', body: Buffer.from(fixture) }));
+    await fixturePage.route('**/models/Device.glb', route => route.fulfill({ contentType: 'model/gltf-binary', body: Buffer.from(fixture) }));
     await fixturePage.reload();
     await fixturePage.waitForFunction(() => window.viewerDebug?.snapshot().ready);
     let fixtureState = await fixturePage.evaluate(() => viewerDebug.snapshot());
