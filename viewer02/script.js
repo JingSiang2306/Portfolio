@@ -2,6 +2,8 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { TrackballControls } from 'three/addons/controls/TrackballControls.js';
 import { COMPONENT_INFO } from './component-info.js';
+import { arrangeExplosion, isHardware } from '../js/assembly-layout.js';
+import { EXPLOSION_LAYOUT } from './explosion-layout.js';
 
 // Project 02 is already upright in Y-up. Preserve its source assembly transforms.
 const MODEL_URL = new URL('./models/Device.glb', import.meta.url).href;
@@ -14,7 +16,6 @@ const components = [];
 const meshOwners = new Map();
 const materialStates = new Map();
 const raycaster = new THREE.Raycaster();
-const assemblyCenter = new THREE.Vector3();
 const presets = {
   ISO: new THREE.Vector3(1, 0.8, 1),
   FRONT: new THREE.Vector3(0, 0, 1),
@@ -87,7 +88,6 @@ async function loadModel() {
     if (bounds.isEmpty() || !Number.isFinite(bounds.min.length() + bounds.max.length())) {
       throw new Error('The GLB contains no usable geometry.');
     }
-    bounds.getCenter(assemblyCenter);
     assemblyRadius = bounds.getBoundingSphere(new THREE.Sphere()).radius;
     if (assemblyRadius <= 0) throw new Error('The GLB has zero-size bounds.');
     discoverComponents(gltf);
@@ -130,6 +130,7 @@ function discoverComponents(gltf) {
   // Use source glTF nodes, so a mesh with several material primitives stays one part.
   model.traverse(node => {
     const index = gltf.parser.associations.get(node)?.nodes;
+    if (index !== undefined) node.userData.sourceName = nodes[index].name;
     const label = COMPONENT_INFO[index];
     if (index !== undefined && label?.sourceName === nodes[index].name) node.userData.componentLabel = label.displayName;
     if (index === undefined || nodes[index].mesh === undefined) return;
@@ -148,6 +149,7 @@ function discoverComponents(gltf) {
       originalWorldPosition: node.getWorldPosition(new THREE.Vector3()),
       bounds: new THREE.Box3(), offset: new THREE.Vector3()
     };
+    component.hardware = isHardware(component);
     components.push(component);
     nodeOwners.set(node, component);
   });
@@ -196,9 +198,10 @@ function logHierarchy(root) {
 }
 
 function buildComponentTree() {
-  const owners = new Map(components.map(part => [part.node, part]));
+  const treeParts = components.filter(part => !part.hardware);
+  const owners = new Map(treeParts.map(part => [part.node, part]));
   const included = new Set();
-  components.forEach(part => {
+  treeParts.forEach(part => {
     for (let node = part.node; node; node = node.parent) included.add(node);
   });
   const list = document.createElement('ul');
@@ -245,7 +248,7 @@ function buildComponentTree() {
   }
   appendNode(model, list);
   $('#componentTree').replaceChildren(list);
-  $('#componentCount').textContent = String(components.length).padStart(2, '0');
+  $('#componentCount').textContent = String(treeParts.length).padStart(2, '0');
 }
 
 function makeButton(text, label, handler) {
@@ -269,7 +272,7 @@ function updateMaterials() {
 
 function selectComponent(part) {
   selected = part;
-  components.forEach(component => component.row.querySelector('.component-select').setAttribute('aria-pressed', String(component === part)));
+  components.forEach(component => component.row?.querySelector('.component-select').setAttribute('aria-pressed', String(component === part)));
   $('#selectedName').textContent = part?.name || 'Select a component';
   $('#selectedDescription').textContent = part?.description || 'Choose a part in the viewport or component list to inspect it.';
   $('#selectedSource').textContent = part ? `SOURCE / ${part.originalName}` : '';
@@ -313,16 +316,7 @@ function showAllComponents() {
 }
 
 function calculateExplodedPositions() {
-  components.forEach((part, index) => {
-    const direction = part.bounds.getCenter(new THREE.Vector3()).sub(assemblyCenter);
-    if (direction.length() < assemblyRadius * 0.0001) {
-      // Deterministic spherical fallback for centered parts; never tuned to this model.
-      const y = 1 - 2 * (index + 0.5) / components.length;
-      const angle = index * Math.PI * (3 - Math.sqrt(5));
-      direction.set(Math.cos(angle) * Math.sqrt(1 - y * y), y, Math.sin(angle) * Math.sqrt(1 - y * y));
-    }
-    part.offset.copy(direction.normalize().multiplyScalar(assemblyRadius * 0.85));
-  });
+  arrangeExplosion(components, EXPLOSION_LAYOUT, assemblyRadius);
 }
 
 function applyExplosion(amount) {
@@ -357,15 +351,15 @@ function setExplosionAmount(amount, immediate = false) {
   requestRender();
 }
 
-function fitDistance(amount) {
+function fitDistance(amount, center) {
   // A sphere enclosing all original AABB corners plus their calculated offsets is
   // conservative in every view and aspect ratio, including exploded/mobile views.
-  let radius = assemblyRadius;
+  let radius = 0;
   components.forEach(part => {
     for (const x of [part.bounds.min.x, part.bounds.max.x]) {
       for (const y of [part.bounds.min.y, part.bounds.max.y]) {
         for (const z of [part.bounds.min.z, part.bounds.max.z]) {
-          radius = Math.max(radius, new THREE.Vector3(x, y, z).addScaledVector(part.offset, amount).distanceTo(assemblyCenter));
+          radius = Math.max(radius, new THREE.Vector3(x, y, z).addScaledVector(part.offset, amount).distanceTo(center));
         }
       }
     }
@@ -378,20 +372,23 @@ function fitDistance(amount) {
 function frameModel(direction, amount = explosionTarget, immediate = false, up = camera.up) {
   // Consume pending input before the preset/fit animation takes camera ownership.
   controls.update();
-  const distance = fitDistance(amount);
-  const position = assemblyCenter.clone().addScaledVector(direction.clone().normalize(), distance);
+  const bounds = new THREE.Box3();
+  components.forEach(part => bounds.union(part.bounds.clone().translate(part.offset.clone().multiplyScalar(amount))));
+  const frameCenter = bounds.getCenter(new THREE.Vector3());
+  const distance = fitDistance(amount, frameCenter);
+  const position = frameCenter.clone().addScaledVector(direction.clone().normalize(), distance);
   cameraAnimation = {
     from: camera.position.clone(), to: position,
-    fromTarget: controls.target.clone(), toTarget: assemblyCenter.clone(),
+    fromTarget: controls.target.clone(), toTarget: frameCenter.clone(),
     fromUp: camera.up.clone(),
     upRotation: new THREE.Quaternion().setFromUnitVectors(camera.up.clone().normalize(), up.clone().normalize()),
     start: performance.now(), duration: 500
   };
   if (immediate || reducedMotion.matches) {
     camera.position.copy(position);
-    controls.target.copy(assemblyCenter);
+    controls.target.copy(frameCenter);
     camera.up.copy(up);
-    camera.lookAt(assemblyCenter);
+    camera.lookAt(frameCenter);
     controls.update();
     cameraAnimation = null;
   }
@@ -445,7 +442,7 @@ function pickComponent(event) {
   const meshes = [...meshOwners.keys()].filter(mesh => meshOwners.get(mesh).visible);
   const hit = raycaster.intersectObjects(meshes, false)[0];
   selectComponent(hit ? meshOwners.get(hit.object) : null);
-  if (selected) {
+  if (selected?.row) {
     // Only scroll the list itself; avoid jumping the entire mobile page.
     const panel = $('.assembly-tree');
     const row = selected.row.getBoundingClientRect();
@@ -599,6 +596,7 @@ function exposeDiagnostics() {
         allBoundsFit: corners.every(([x, y, z]) => Math.abs(x) <= 1 && Math.abs(y) <= 1 && z >= -1 && z <= 1),
         components: components.map(part => ({
           id: part.id, name: part.name, sourceName: part.sourceName, visible: part.visible,
+          hardware: part.hardware, listed: Boolean(part.row), explosionGroup: part.explosionGroup, offset: part.offset.toArray(),
           position: part.node.position.toArray(), originalPosition: part.originalPosition.toArray(),
           worldPosition: part.node.getWorldPosition(new THREE.Vector3()).toArray(),
           expectedWorldPosition: part.originalWorldPosition.clone().addScaledVector(part.offset, explosionAmount).toArray(),

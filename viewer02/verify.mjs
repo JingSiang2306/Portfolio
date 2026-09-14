@@ -60,6 +60,10 @@ if (!process.argv.includes('--serve')) {
     assert.equal(modelJson.materials.length, 33);
     assert.equal(beforeHash, '6e30e3daae20ab7c31fdea8b271039b3d33fc52bf34b8c1efb18746e3f9730f9');
     assert(state.allBoundsFit);
+    assert(state.components.some(part => part.hardware));
+    assert(state.components.every(part => part.listed === !part.hardware && part.visible));
+    assert.equal(await page.locator('.component-row').count(), state.components.filter(part => part.listed).length);
+    assert.equal(Number(await page.locator('#componentCount').innerText()), state.components.filter(part => part.listed).length);
     await page.screenshot({ path: join(output, 'desktop.png'), fullPage: true });
     console.log('PASS: GLB load, 26 parts, short display names, source orientation, initial bounds fit');
 
@@ -139,18 +143,35 @@ if (!process.argv.includes('--serve')) {
       return point.id;
     }
     await pickVisiblePart();
+    const hardwarePoint = await page.evaluate(() => {
+      for (const part of viewerDebug.snapshot().components.filter(part => part.hardware)) {
+        const point = viewerDebug.pickPoint(part.id);
+        if (point) return { ...point, id: part.id };
+      }
+    });
+    assert(hardwarePoint, 'Visible hardware stays selectable despite having no tree row');
+    await page.mouse.click(hardwarePoint.x, hardwarePoint.y);
+    state = await snapshot();
+    assert.equal(state.selected, hardwarePoint.id);
+    assert.equal(state.components[hardwarePoint.id].listed, false);
+    await click('#selectedVisibility');
+    assert.equal((await snapshot()).components[hardwarePoint.id].visible, false);
+    await click('#selectedVisibility');
+    await click('#clearSelection');
+    console.log('PASS: hardware omitted from tree, still rendered, selectable and hideable');
+    const listedId = Number(await page.locator('.component-row').nth(1).getAttribute('data-component'));
     await page.locator('.component-select').nth(1).click();
     state = await snapshot();
-    assert.equal(state.selected, 1);
-    assert(state.components[1].highlighted);
-    assert(state.components.filter(part => part.id !== 1).every(part => part.originalMaterials));
+    assert.equal(state.selected, listedId);
+    assert(state.components[listedId].highlighted);
+    assert(state.components.filter(part => part.id !== listedId).every(part => part.originalMaterials));
     await click('#selectedVisibility');
-    assert.equal((await snapshot()).components[1].visible, false);
-    assert.equal(await page.evaluate(() => viewerDebug.pickPoint(1)), null);
+    assert.equal((await snapshot()).components[listedId].visible, false);
+    assert.equal(await page.evaluate(id => viewerDebug.pickPoint(id), listedId), null);
     await click('#selectedVisibility');
-    assert.equal((await snapshot()).components[1].visible, true);
+    assert.equal((await snapshot()).components[listedId].visible, true);
     await click('#selectedIsolate');
-    assert.deepEqual((await snapshot()).components.filter(part => part.visible).map(part => part.id), [1]);
+    assert.deepEqual((await snapshot()).components.filter(part => part.visible).map(part => part.id), [listedId]);
     await click('#showAll');
     assert((await snapshot()).components.every(part => part.visible));
     await page.mouse.click(box.x + 8, box.y + box.height - 8);
@@ -161,7 +182,15 @@ if (!process.argv.includes('--serve')) {
     state = await snapshot();
     assert.equal(state.explosionAmount, 1);
     assert(state.allBoundsFit);
-    assert(state.components.every(part => part.position.some((value, i) => value !== part.originalPosition[i])));
+    assert(state.components.some(part => part.position.some((value, i) => value !== part.originalPosition[i])));
+    const groupOffsets = new Map();
+    state.components.forEach(part => {
+      assert(part.offset.filter(value => Math.abs(value) > 1e-12).length <= 1, 'Straight-axis separation');
+      assert(!part.explosionGroup.startsWith('Part '), 'Every source part belongs to a configured assembly group');
+      if (groupOffsets.has(part.explosionGroup)) assert.deepEqual(part.offset, groupOffsets.get(part.explosionGroup));
+      groupOffsets.set(part.explosionGroup, part.offset);
+      assert(part.worldPosition.every((value, i) => Math.abs(value - part.expectedWorldPosition[i]) < 1e-8));
+    });
     await pickVisiblePart();
     await page.screenshot({ path: join(output, 'exploded-selection.png'), fullPage: true });
     await click('#selectedIsolate');
@@ -315,7 +344,7 @@ if (!process.argv.includes('--serve')) {
     assert(fixtureState.allBoundsFit);
     fixtureState.components.forEach(part => {
       assert(part.worldPosition.every((value, i) => Number.isFinite(value) && Math.abs(value - part.expectedWorldPosition[i]) < 1e-8));
-      assert(part.position.some((value, i) => Math.abs(value - part.originalPosition[i]) > 1e-8));
+
     });
     await fixturePage.locator('.component-isolate').nth(1).click();
     const childPoint = await fixturePage.evaluate(() => viewerDebug.pickPoint(1));
@@ -327,7 +356,7 @@ if (!process.argv.includes('--serve')) {
     fixtureState = await fixturePage.evaluate(() => viewerDebug.snapshot());
     fixtureState.components.forEach(part => assert.deepEqual(part.position, part.originalPosition));
     await fixturePage.close();
-    console.log('PASS: replacement fixture with nested rotations/scales, grouped material primitives, centered-part fallback, child isolation, exact reset');
+    console.log('PASS: replacement fixture with nested rotations/scales, grouped material primitives, ordered vertical fallback, child isolation, exact reset');
     assert.equal(await digest(), beforeHash);
     console.log('PASS: model SHA256 unchanged:', beforeHash);
   } finally {

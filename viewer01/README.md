@@ -1,4 +1,4 @@
-﻿# Project 01 mechanical assembly viewer
+# Project 01 mechanical assembly viewer
 
 Open `/viewer01/` through a static HTTP server or Vercel. Production code runs in the browser with no build step or backend.
 
@@ -21,6 +21,8 @@ Battery: {
 }
 ```
 
+The tree lists 110 parts. Its 53 screws, nuts, bolts, washers, spacers, and springs are omitted from the list, but remain rendered and selectable in the viewport. The shared logic is in `../js/assembly-layout.js`.
+
 Unconfigured parts use their short GLB names. Duplicate names in future models remain independently selectable by object identity.
 
 ## Orientation and navigation
@@ -39,7 +41,7 @@ Three.js 0.180.0, GLTFLoader, and TrackballControls use the version-pinned jsDel
 
 A source glTF mesh node is one selectable component; multiple material primitives stay grouped. Named nested groups appear in the component tree and redundant wrappers collapse. Raycasts map meshes to their owning source node. Cached material variants provide selection and wireframe effects; clearing/resetting restores original material references.
 
-Visibility uses a non-rendered layer so hiding a parent component does not hide independently selectable children. Explosion uses world bounding-box centers and assembly radius; centered parts get a deterministic fallback direction. Parent-first world-to-local conversion respects nested rotation and scale. Assemble restores local positions exactly. The explosion is illustrative, not a collision-free disassembly procedure.
+Visibility uses a non-rendered layer so hiding a parent component does not hide independently selectable children. Explosion uses the straight-axis groups in `explosion-layout.js`: casing layers separate along Z, the battery and board stack along Y, and the case fan along X. Camera, charger, Pi, SSD HAT, and cooler subcomponents share their group translation. Loose hardware follows the nearest main part. Offsets are scaled by assembly radius; unknown replacement parts use ordered vertical layers. Camera framing recenters on the separated assembly. Parent-first world-to-local conversion respects nested rotation and scale. Assemble restores local positions exactly. The explosion is illustrative, not a collision-free disassembly procedure.
 
 Camera framing uses an enclosing sphere and both viewport FOVs. Rendering runs only during input, transitions, or invalidation and pauses in a hidden tab. The model is downloaded once per page load. Theme uses the existing `portfolio-theme` setting.
 
@@ -54,7 +56,7 @@ node viewer01/verify.mjs --serve  # http://127.0.0.1:4173
 node viewer01/verify.mjs          # browser checks; screenshots in OS temp directory
 ```
 
-Checks cover the current model counts, every node/mesh name, upright correction, initial framing, presets, full forward and reverse 360-degree pitch via real pointer drags, both poles, preserving roll while exploded, upright reset, mouse/touch/keyboard navigation, selection, materials, visibility, exact reassembly, idle rendering, one model download, themes, narrow layouts, reduced motion, portfolio navigation, and loading failure. A synthetic nested assembly checks grouped primitives, transformed parents, centered parts, child isolation, and exact reset. Tests do not modify the GLB.
+Checks cover the current model counts, every node/mesh name, upright correction, initial framing, presets, full forward and reverse 360-degree pitch via real pointer drags, both poles, preserving roll while exploded, upright reset, mouse/touch/keyboard navigation, selection including unlisted hardware, filtered tree counts, rigid group offsets, materials, visibility, exact reassembly, idle rendering, one model download, themes, narrow layouts, reduced motion, portfolio navigation, and loading failure. A synthetic nested assembly checks grouped primitives, transformed parents, centered parts, child isolation, and exact reset. Tests do not modify the GLB.
 
 ## Deployment and limits
 

@@ -10,7 +10,7 @@ The model is already upright in Y-up, so `MODEL_ROTATION_Z` is zero. The viewer 
 
 ## Component labels
 
-`component-info.js` supplies short display names for all parts and assemblies, including Pipe, Breadboard, SPC Holder, Top Holder, Battery Holder, SPC1520, Slide Switch, Battery, Lower Clamp, Upper Clamp, Bottom Holder, STM32U5 Board, and numbered fasteners. The original CAD name appears in the inspector.
+`component-info.js` supplies short display names for all parts and assemblies, including Pipe, Breadboard, SPC Holder, Top Holder, Battery Holder, SPC1520, Slide Switch, Battery, Lower Clamp, Upper Clamp, Bottom Holder, STM32U5 Board, and numbered fasteners. The original CAD name appears in the inspector. The tree shows 12 main parts; 14 screws, bolts, and nuts are omitted from the list but remain visible and selectable in the viewport.
 
 Entries use source node indices because several screws have identical source names. Each entry also checks `sourceName` before applying a label. If the model is replaced, inspect its hierarchy and update the configuration; unmatched nodes fall back to their original names.
 
@@ -33,7 +33,7 @@ SPC1520 retains its source identifier because the export does not specify its fu
 - Explode/Assemble and the slider separate/reassemble the parts. Wireframe toggles mesh edges.
 - Focus the canvas for arrow-key pan, plus/minus zoom, and Escape to clear selection.
 
-Rotation follows the pointer without inertia. Preset and explosion transitions respect reduced motion. Explosion is illustrative, not a physical disassembly sequence. Parent-first world-to-local positioning handles the nested assembly transforms and restores local positions exactly.
+Rotation follows the pointer without inertia. Preset and explosion transitions respect reduced motion. The `explosion-layout.js` configuration opens the device in ordered vertical layers around a stationary pipe: lower clamp, upper clamp, base, controller, electronics tray, and lid. The battery, breadboard, switch, and holders move together, and loose fasteners follow the nearest main part. Offsets are in assembly-radius units, handled by `../js/assembly-layout.js`. Framing recenters on the separated assembly. Explosion is illustrative, not a physical disassembly sequence. Parent-first world-to-local positioning handles the nested assembly transforms and restores local positions exactly.
 
 ## Running and verification
 
@@ -46,6 +46,6 @@ node viewer02/verify.mjs --serve  # http://127.0.0.1:4174/viewer02/
 node viewer02/verify.mjs          # browser checks; screenshots in OS temp directory
 ```
 
-Checks cover model integrity, 26 unique display labels, orientation, framing, four presets, full forward/reverse pitch turns, selection, materials, visibility/isolation, explosion, exact reassembly, keyboard and emulated touch navigation, narrow layouts, themes, reduced motion, idle rendering, one GLB download, the portfolio link, missing-model errors, and a synthetic nested assembly. A replacement GLB requires updating the expected model metadata/hash in the test.
+Checks cover model integrity, 26 unique display labels, orientation, framing, four presets, full forward/reverse pitch turns, selection including unlisted hardware, filtered tree counts, rigid group offsets, materials, visibility/isolation, explosion, exact reassembly, keyboard and emulated touch navigation, narrow layouts, themes, reduced motion, idle rendering, one GLB download, the portfolio link, missing-model errors, and a synthetic nested assembly. A replacement GLB requires updating the expected model metadata/hash in the test.
 
 Vercel can serve this folder alongside the portfolio. Include the case-sensitive `models/Device.glb` path. Module/model loading failures show an error message, and fonts have system fallbacks. Physical-device performance and live deployment require separate verification.
