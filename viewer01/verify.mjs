@@ -191,15 +191,13 @@ if (!process.argv.includes('--serve')) {
     await page.setViewportSize({ width: 1440, height: 1100 });
     await page.goto(origin + '/');
     const link = page.getByRole('link', { name: '3D Viewer →' });
-    assert.equal(await link.getAttribute('target'), '_blank');
-    assert.equal(await link.getAttribute('rel'), 'noopener noreferrer');
+    assert.equal(await link.getAttribute('target'), null);
     await link.focus();
     assert(await page.locator('#viewerHint').isVisible());
-    const [popup] = await Promise.all([page.waitForEvent('popup'), link.click()]);
-    await popup.waitForFunction(() => document.querySelector('#status')?.dataset.state === 'ready');
-    assert(popup.url().endsWith('/viewer01/'));
-    await popup.close();
-    console.log('PASS: portfolio button, keyboard tooltip, opens working viewer in new tab');
+    await link.click();
+    await page.waitForFunction(() => document.querySelector('#status')?.dataset.state === 'ready');
+    assert(page.url().endsWith('/viewer01/'));
+    console.log('PASS: portfolio button, keyboard tooltip, opens working viewer in the same tab');
 
     // Mobile touch input via Chromium's touch event pipeline.
     const mobile = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true, deviceScaleFactor: 2 });

@@ -58,7 +58,7 @@ node viewer01/verify.mjs --serve  # static preview at http://127.0.0.1:4173
 node viewer01/verify.mjs          # browser checks; screenshots saved in OS temp directory
 ```
 
-The checks cover loading, bounds, mouse navigation, four presets, raycast selection before/after explosion, materials, visibility/isolation, slider, exact reassembly, reset, keyboard controls, idle rendering, one model download, themes, narrow layouts, reduced motion, the portfolio new-tab link, emulated touch gestures and loading failure. An unrelated synthetic in-memory assembly tests replacement behavior with nested transforms, multiple material primitives and a centered part. It never rewrites the supplied model.
+The checks cover loading, bounds, mouse navigation, four presets, raycast selection before/after explosion, materials, visibility/isolation, slider, exact reassembly, reset, keyboard controls, idle rendering, one model download, themes, narrow layouts, reduced motion, the portfolio same-tab link, emulated touch gestures and loading failure. An unrelated synthetic in-memory assembly tests replacement behavior with nested transforms, multiple material primitives and a centered part. It never rewrites the supplied model.
 
 ## Deployment and limits
 
