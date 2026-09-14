@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Explore the Project 01 mechanical assembly designed by Cheng Jing Siang.">
+  <title>Project 01 · 3D Viewer — Cheng Jing Siang</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%2308131f'/%3E%3Ctext x='5' y='22' fill='%235eead4' font-family='monospace' font-size='17'%3E01%3C/text%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script>try { if (localStorage.getItem('portfolio-theme') === 'light') document.documentElement.dataset.theme = 'light'; } catch {}</script>
+  <script type="importmap">
+    {"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/"}}
+  </script>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <a class="back-link" href="../#projects">← Back to Portfolio</a>
+      <span class="header-tag">PROJECT 01 / 3D VIEWER</span>
+      <button id="themeToggle" aria-label="Switch to light theme" aria-pressed="false" type="button">☀</button>
+    </header>
+    <main>
+      <section class="intro" aria-labelledby="pageTitle">
+        <div><p class="eyebrow">DESIGN STUDY / 01</p><h1 id="pageTitle">Automated Elephant Detection Device<span>Mechanical Assembly</span></h1></div>
+        <p class="lead">Explore the mechanical assembly designed for Project 01. Rotate, zoom and select components to inspect the system.</p>
+      </section>
+      <section class="workbench" aria-label="Interactive assembly viewer">
+        <div class="workbench-heading"><span class="mono">ASSEMBLY EXPLORER</span><span id="status" role="status" aria-live="polite" data-state="loading">Loading 3D assembly...</span></div>
+        <div class="workspace">
+          <aside class="sidebar" aria-label="Assembly components">
+            <div class="panel-heading"><h2>Components <span id="componentCount"></span></h2><button id="showAll" type="button" disabled>Show All</button></div>
+            <details class="assembly-tree" open><summary>Assembly</summary><div id="componentTree"><p class="empty-tree">The component list will appear here.</p></div></details>
+            <section class="component-info" aria-labelledby="selectedName" aria-live="polite">
+              <p class="eyebrow">COMPONENT INSPECTOR</p><h3 id="selectedName">Select a component</h3>
+              <p id="selectedDescription">Choose a part in the viewport or component list to inspect it.</p>
+              <p id="selectedSource" class="mono"></p>
+              <div class="selection-actions"><button id="selectedVisibility" type="button" disabled>Hide</button><button id="selectedIsolate" type="button" disabled>Isolate</button><button id="clearSelection" type="button" disabled>Clear</button></div>
+            </section>
+          </aside>
+          <div class="viewport-column">
+            <div id="viewport" aria-label="3D assembly viewport">
+              <div class="viewport-label"><span id="viewLabel">ISO / PERSPECTIVE</span><span>Y ↑</span></div>
+              <div id="loading" class="loading"><span class="loading-mark" aria-hidden="true">◇</span><p id="loadingMessage">Loading 3D assembly...</p><progress id="loadProgress" aria-label="Assembly download progress" max="100"></progress></div>
+              <div class="axis-key" aria-hidden="true"><span>X</span><span>Y</span><span>Z</span></div>
+            </div>
+            <p class="instructions" id="navigationHelp"><span class="desktop-help">Drag to rotate · Scroll to zoom · Right-drag to pan · Click a component to inspect</span><span class="touch-help">One finger to rotate · Pinch to zoom · Two fingers to pan · Tap a component to inspect</span><span class="keyboard-help">Keyboard: focus the view, arrows to pan, + / − to zoom. Use presets to rotate.</span></p>
+          </div>
+        </div>
+        <fieldset id="viewerControls" class="toolbar" disabled>
+          <legend class="sr-only">Viewer controls</legend>
+          <div class="preset-controls" role="group" aria-label="Engineering view presets"><button type="button" data-view="ISO" aria-pressed="true">ISO</button><button type="button" data-view="FRONT" aria-pressed="false">FRONT</button><button type="button" data-view="TOP" aria-pressed="false">TOP</button><button type="button" data-view="RIGHT" aria-pressed="false">RIGHT</button></div>
+          <div class="explosion-controls"><button id="assemble" type="button">Assemble</button><div class="slider-control"><label for="explosion">Explosion <output id="explosionValue" for="explosion">0%</output></label><input id="explosion" type="range" min="0" max="100" value="0" step="1"></div><button id="explode" type="button">Explode</button></div>
+          <div class="display-controls"><button id="wireframe" type="button" aria-pressed="false">Wireframe</button><button id="reset" class="primary" type="button">Reset View</button></div>
+        </fieldset>
+      </section>
+      <p class="model-note">Development preview · Temporary converted geometry; component alignment may be inaccurate.</p>
+      <noscript><p>Enable JavaScript to explore the 3D assembly.</p></noscript>
+    </main>
+    <footer><span>CHENG JING SIANG / PROJECT 01</span><span>MECHANICAL DESIGN · INTERACTIVE STUDY</span></footer>
+  </div>
+  <script type="module">
+    // Catch dependency/network failures too, before the viewer module can initialize.
+    import('./script.js').catch(error => {
+      console.error('Viewer initialization failed:', error);
+      document.querySelector('#status').textContent = 'The 3D assembly could not be loaded.';
+      document.querySelector('#status').dataset.state = 'error';
+      document.querySelector('#loadingMessage').textContent = 'The 3D assembly could not be loaded.';
+      document.querySelector('#loadProgress').hidden = true;
+    });
+  </script>
+</body>
+</html>
