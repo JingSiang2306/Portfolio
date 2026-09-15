@@ -4,7 +4,7 @@ Open `/viewer01/` through a static HTTP server or Vercel. Production code runs i
 
 ## Current model and component names
 
-`models/Holder_v7.glb` is the corrected SOLIDWORKS export, with 163 selectable mesh nodes, 162 mesh definitions (one is shared), 18 assembly/group nodes, one CAD camera node, and 130 materials. The renamed file is 46,579,172 bytes (44.42 MiB).
+`models/Holder_v7.glb` is the corrected SOLIDWORKS export, with 163 source mesh nodes, 162 mesh definitions (one is shared), 18 assembly/group nodes, one CAD camera node, and 130 materials. The renamed file is 46,579,172 bytes (44.42 MiB).
 
 All 182 nodes and 162 mesh definitions have short names. Main assemblies include Device, Camera V3, Solar Charger, Case Fan Assembly, Pi 5, SSD HAT, and Pi Cooler. Parts include Mic, Camera V2, Battery, Holder, Gasket, Cam Lens, NVMe SSD, and numbered screws, spacers, and washers. Names are unique across nodes and no longer than 22 characters.
 
@@ -21,7 +21,7 @@ Battery: {
 }
 ```
 
-The tree lists 110 parts. Its 53 screws, nuts, bolts, washers, spacers, and springs are omitted from the list, but remain rendered and selectable in the viewport. The shared logic is in `../js/assembly-layout.js`.
+The viewer exposes 54 selectable parts, with 21 main parts in the tree and 33 loose hardware parts selectable in the viewport. Camera V3, Solar Charger, Pi 5, SSD HAT, Pi Cooler, and Case Fan each own their complete subassembly, including internal hardware. The shared logic is in `../js/assembly-layout.js`.
 
 Unconfigured parts use their short GLB names. Duplicate names in future models remain independently selectable by object identity.
 
@@ -35,13 +35,13 @@ Three.js 0.180.0, GLTFLoader, and TrackballControls use the version-pinned jsDel
 - Wheel or pinch: zoom. Right-drag or two fingers: pan.
 - Focus the canvas: arrow keys pan, plus/minus zoom, Escape clears selection.
 - ISO, FRONT (+Z), TOP (+Y), and RIGHT (+X) restore a consistent orientation. TOP uses -Z as screen-up; other presets use +Y. Reset restores the upright ISO view and clears explosion, selection, hidden parts, and wireframe.
-- Rotation follows the pointer without inertia. Preset and explosion transitions are smooth unless reduced motion is requested. Explosion and resize framing preserve the camera's current roll.
+- Rotation follows the pointer without inertia. Preset and explosion transitions are smooth unless reduced motion is requested. Assemble/Explode buttons refit the camera and preserve its roll. Slider input and component selection preserve the current camera position and target. Only window resizing triggers automatic reframing.
 
 ## Implementation
 
-A source glTF mesh node is one selectable component; multiple material primitives stay grouped. Named nested groups appear in the component tree and redundant wrappers collapse. Raycasts map meshes to their owning source node. Cached material variants provide selection and wireframe effects; clearing/resetting restores original material references.
+A source glTF mesh node is one selectable component; multiple material primitives stay grouped. Entries marked `rigid: true` in `component-info.js` instead make a complete subassembly one selectable part. All descendant meshes map to that part for picking, highlighting, visibility, and explosion. Other named groups appear in the component tree and redundant wrappers collapse. Cached material variants provide selection and wireframe effects; clearing/resetting restores original material references.
 
-Visibility uses a non-rendered layer so hiding a parent component does not hide independently selectable children. Explosion uses the straight-axis groups in `explosion-layout.js`: casing layers separate along Z, the battery and board stack along Y, and the case fan along X. Camera, charger, Pi, SSD HAT, and cooler subcomponents share their group translation. Loose hardware follows the nearest main part. Offsets are scaled by assembly radius; unknown replacement parts use ordered vertical layers. Camera framing recenters on the separated assembly. Parent-first world-to-local conversion respects nested rotation and scale. Assemble restores local positions exactly. The explosion is illustrative, not a collision-free disassembly procedure.
+Visibility uses a non-rendered layer so hiding a parent component does not hide independently selectable children. Explosion uses the straight-axis groups in `explosion-layout.js`: casing layers separate along Z, the battery and board stack along Y, and the case fan and vents along X, with Vent 02 to the right of the fan. All four Pi spacers move only along Y to a shared layer between the holder and Pi 5. Loose hardware follows the nearest main part unless explicitly configured. Offsets are scaled by assembly radius; unknown replacement parts use ordered vertical layers. Assemble/Explode buttons recenter on the assembly; the slider leaves the camera unchanged. Both the inspector Isolate button and each row's circle button toggle between one part and all components. Parent-first world-to-local conversion respects nested rotation and scale. Assemble restores local positions exactly. The explosion is illustrative, not a collision-free disassembly procedure.
 
 Camera framing uses an enclosing sphere and both viewport FOVs. Rendering runs only during input, transitions, or invalidation and pauses in a hidden tab. The model is downloaded once per page load. Theme uses the existing `portfolio-theme` setting.
 

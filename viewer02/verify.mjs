@@ -2,6 +2,7 @@
 // Install playwright-core outside the website and set PLAYWRIGHT_MODULE to its
 // index.mjs, plus CHROME_PATH if Chrome is not in the usual Windows location.
 import assert from 'node:assert/strict';
+import { verifyViewerInteractions } from '../tests/viewer-interactions.mjs';
 import { createServer } from 'node:http';
 import { readFile, stat, mkdir, mkdtemp } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
@@ -64,6 +65,7 @@ if (!process.argv.includes('--serve')) {
     assert(state.components.every(part => part.listed === !part.hardware && part.visible));
     assert.equal(await page.locator('.component-row').count(), state.components.filter(part => part.listed).length);
     assert.equal(Number(await page.locator('#componentCount').innerText()), state.components.filter(part => part.listed).length);
+    await verifyViewerInteractions(page, '02');
     await page.screenshot({ path: join(output, 'desktop.png'), fullPage: true });
     console.log('PASS: GLB load, 26 parts, short display names, source orientation, initial bounds fit');
 

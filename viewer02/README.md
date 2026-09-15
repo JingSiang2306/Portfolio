@@ -10,7 +10,7 @@ The model is already upright in Y-up, so `MODEL_ROTATION_Z` is zero. The viewer 
 
 ## Component labels
 
-`component-info.js` supplies short display names for all parts and assemblies, including Pipe, Breadboard, SPC Holder, Top Holder, Battery Holder, SPC1520, Slide Switch, Battery, Lower Clamp, Upper Clamp, Bottom Holder, STM32U5 Board, and numbered fasteners. The original CAD name appears in the inspector. The tree shows 12 main parts; 14 screws, bolts, and nuts are omitted from the list but remain visible and selectable in the viewport.
+`component-info.js` supplies short display names for all parts and assemblies, including Pipe, Breadboard, SPC Holder, Top Holder, Battery Holder, SPC1520, Slide Switch, Battery, Lower Clamp, Upper Clamp, Bottom Holder, STM32U5 Board, and numbered fasteners. The original CAD name appears in the inspector. Bottom Assembly appears directly after Top Assembly, before the two clamps. The tree shows 12 main parts; 14 screws, bolts, and nuts are omitted from the list but remain visible and selectable in the viewport.
 
 Entries use source node indices because several screws have identical source names. Each entry also checks `sourceName` before applying a label. If the model is replaced, inspect its hierarchy and update the configuration; unmatched nodes fall back to their original names.
 
@@ -30,10 +30,11 @@ SPC1520 retains its source identifier because the export does not specify its fu
 - Scroll/pinch to zoom; right-drag or use two fingers to pan.
 - Click/tap a component, or select it in the nested list, to inspect, hide, or isolate it.
 - ISO, FRONT, TOP, and RIGHT restore consistent views. Reset restores upright ISO, assembled positions, all visibility, and original materials.
-- Explode/Assemble and the slider separate/reassemble the parts. Wireframe toggles mesh edges.
+- Explode/Assemble buttons separate/reassemble and refit the camera. Slider input and component selection keep the camera position and target fixed.
+- Both the inspector Isolate button and each row's circle button toggle between one component and full visibility. Wireframe toggles mesh edges.
 - Focus the canvas for arrow-key pan, plus/minus zoom, and Escape to clear selection.
 
-Rotation follows the pointer without inertia. Preset and explosion transitions respect reduced motion. The `explosion-layout.js` configuration opens the device in ordered vertical layers around a stationary pipe: lower clamp, upper clamp, base, controller, electronics tray, and lid. The battery, breadboard, switch, and holders move together, and loose fasteners follow the nearest main part. Offsets are in assembly-radius units, handled by `../js/assembly-layout.js`. Framing recenters on the separated assembly. Explosion is illustrative, not a physical disassembly sequence. Parent-first world-to-local positioning handles the nested assembly transforms and restores local positions exactly.
+Rotation follows the pointer without inertia. Preset and explosion transitions respect reduced motion. The `explosion-layout.js` configuration opens the device in ordered vertical layers around a stationary pipe: lower clamp, upper clamp, base, controller, electronics tray, and lid. The breadboard, switch, and holders move together, while the battery separates slightly below its holder. Screw 10 follows the top holder alongside corner screws 06, 08, and 09. Other loose fasteners follow the nearest main part. Offsets are in assembly-radius units, handled by `../js/assembly-layout.js`. Button framing recenters on the assembly; slider input leaves the camera unchanged. Inspector layout changes do not refit the camera. Explosion is illustrative, not a physical disassembly sequence. Parent-first world-to-local positioning handles the nested assembly transforms and restores local positions exactly.
 
 ## Running and verification
 
