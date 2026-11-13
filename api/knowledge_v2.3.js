@@ -1,18 +1,26 @@
 // v2.3: explicit rig noise coverage and introduction scoped to profile questions.
+// Profile, skills and experience updated from Knowledge/Resume 2026-11-11.pdf;
+// current employment is recorded as of that resume's date (11 Nov 2026).
 // Sources: uploaded v2.1; portfolio role statement confirmed by Jing Siang;
 // Project 02 thesis sections 3.5.2–3.5.3, 4.1 (noise data), 4.2 and 4.3.3.
 module.exports = `
 ===== PROFILE =====
 Full name: Cheng Jing Siang. Everyday name: Jing Siang.
-Profile introduction (only when asked about Jing Siang): Cheng Jing Siang is a Mechatronic Engineering graduate from the University of Nottingham Malaysia, where he earned a master's degree with First-Class Honours.
-Background: automation, mechanical design, programming and practical AI classification systems; hands-on SolidWorks, 3D printing, Python, C and MATLAB. Interests: automation, software development and practical engineering solutions. Strengths: problem-solving and teamwork.
+Profile introduction (only when asked about Jing Siang): Cheng Jing Siang is an Associate Machine Learning Engineer at META Research Sdn. Bhd. and a Mechatronic Engineering graduate from the University of Nottingham Malaysia, where he earned a master's degree with First-Class Honours.
+Background: strong foundation in artificial intelligence, robotics, automation and programming. Hands-on experience developing AI-based systems, computer vision applications and embedded engineering projects, complemented by professional experience in machine learning and model validation. Passionate about applying AI and engineering knowledge to develop innovative, real-world solutions.
 Contact: 2306cjs@gmail.com; 012-548-8250.
-Skills: SolidWorks, 3D printing, MATLAB, Python, AI, C, STM32, Raspberry Pi.
+Skills: SolidWorks, 3D Printing, MATLAB, Python, Artificial Intelligence, Computer Vision, C Programming, STM32, Raspberry Pi, SQL, Vibe Coding, RAG.
 Languages: Mandarin, English.
 
 EXPERIENCE
-- Production Intern, META Research Sdn. Bhd., Selangor: production assembly, component inspection and troubleshooting; designed and fabricated SolidWorks/3D-printed fixtures and workstations to improve production efficiency.
-- Technical Intern, Superdough Sdn. Bhd., Kuala Lumpur: designed IoT electronic props with integrated sensors; troubleshot and maintained electronic/sensor systems.
+Employment information is current as of the 11 Nov 2026 resume.
+- Oct 2026–Present: Associate Machine Learning Engineer, META Research Sdn. Bhd., Selangor.
+  - Evaluate person-tracking and path-linking workflows for customer journey reconstruction in retail environments.
+  - Collect, prepare and validate datasets for computer vision model training and evaluation.
+  - Establish ground-truth annotations and compare model predictions against reference data to assess performance.
+  - Validate AI-assisted workflows, identify system bugs and propose feature improvements to enhance validation efficiency.
+- Jun 2024–Sep 2024: Technical Intern, Superdough Sdn. Bhd., Kuala Lumpur: designed and developed IoT-based electronic props with integrated sensors; troubleshot and maintained electronic and sensor systems to ensure reliable operation.
+- Jun 2023–Sep 2023: Production Intern, META Research Sdn. Bhd., Selangor: supported production assembly, component inspection and troubleshooting; designed and fabricated 3D-printed fixtures and workstations using SolidWorks to improve production efficiency.
 
 EDUCATION
 - Sep 2022–Jul 2026: Master's degree in Mechatronic Engineering, First-Class Honours, University of Nottingham Malaysia, Selangor.

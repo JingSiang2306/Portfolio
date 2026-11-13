@@ -18,8 +18,26 @@ for you.
 index.html              ← your site (chat widget calls /api/chat)
 api/
   chat.js               ← serverless function that talks to the OpenAI API
-  knowledge.js          ← portfolio knowledge used to ground chatbot answers
+  knowledge_v2.3.js     ← active portfolio knowledge used to ground chatbot answers
 ```
+
+## Where the chatbot knowledge lives
+
+The active knowledge base is [`api/knowledge_v2.3.js`](knowledge_v2.3.js).
+[`api/chat.js`](chat.js) loads its exported text with
+`require('./knowledge_v2.3.js')` and includes it in the model instructions.
+The older `knowledge_v*.js` files are retained versions and are not loaded.
+
+The active text is curated manually from
+[`Knowledge/Resume 2026-11-11.pdf`](../Knowledge/Resume%202026-11-11.pdf)
+and the project documents in `Knowledge/`. PDFs are not automatically
+ingested: replacing a resume PDF alone does not update chatbot answers.
+
+When the resume or project details change, update `api/knowledge_v2.3.js`
+and redeploy the backend so `/api/chat` uses the new text. Keep the profile
+introduction example in `api/chat.js` consistent if the introduction changes.
+The browser-side widget in `chatbot/chatbot.js` does not store a separate
+knowledge base.
 
 ## Deploy in ~5 minutes using Vercel
 
@@ -51,7 +69,7 @@ api/
    ├── index.html
    └── api/
        ├── chat.js
-       └── knowledge.js
+       └── knowledge_v2.3.js
    ```
 
    Create a new Vercel project from the folder or GitHub repository.
@@ -161,15 +179,14 @@ Example:
 
   https://openai.com/api/pricing/
 
-- **Knowledge-base size:** sending the full thesis and portfolio documents
-  with every question can use a large number of input tokens. For a
-  portfolio with occasional visitors this may be manageable, but it is more
-  efficient to keep `api/knowledge.js` concise or retrieve only the
-  information relevant to each question.
+- **Knowledge-base size:** the backend sends the curated text from
+  `api/knowledge_v2.3.js` with each question. Keep it concise while preserving
+  the evidence and distinctions needed for accurate answers.
 
 - **Updating the knowledge base:** when you revise your resume or project
-  descriptions, update `api/knowledge.js`. The chat interface does not need
-  to change unless the structure of the backend request changes.
+  descriptions, update `api/knowledge_v2.3.js` and redeploy the backend.
+  The chat interface does not need to change unless the structure of the
+  backend request changes.
 
 - **Security:** never expose `OPENAI_API_KEY` in browser-side code or commit
   it to GitHub. Keep it in Vercel Environment Variables for deployment and

@@ -37,7 +37,7 @@ Return the required JSON: format is paragraphs, bullets or numbered; items holds
 
 EXAMPLES — demonstrate relevance and format, not a fixed-answer lookup
 Q: Who is Jing Siang?
-A: {"format":"paragraphs","items":["Cheng Jing Siang is a Mechatronic Engineering graduate from the University of Nottingham Malaysia, where he earned a master's degree with First-Class Honours."]}
+A: {"format":"paragraphs","items":["Cheng Jing Siang is an Associate Machine Learning Engineer at META Research Sdn. Bhd. and a Mechatronic Engineering graduate from the University of Nottingham Malaysia, where he earned a master's degree with First-Class Honours."]}
 Previous topic: Jing Siang's education.
 Q: Who is Mozart?
 A: {"format":"paragraphs","items":["Wolfgang Amadeus Mozart was an Austrian composer of the Classical period, known for his symphonies, operas, concertos and chamber music."]}
