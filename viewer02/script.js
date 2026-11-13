@@ -25,6 +25,8 @@ const presets = {
 let scene, renderer, camera, controls, model;
 let assemblyRadius = 1;
 let selected = null;
+let isolated = null;
+let windowSize = [innerWidth, innerHeight];
 let explosionAmount = 0;
 let explosionTarget = 0;
 let explosionAnimation = null;
@@ -209,6 +211,11 @@ function buildComponentTree() {
     if (!included.has(node)) return;
     const part = owners.get(node);
     const children = node.children.filter(child => included.has(child));
+    const bottomIndex = children.findIndex(child => child.userData.componentLabel === 'Bottom Assembly');
+    if (bottomIndex !== -1 && children.some(child => child.userData.componentLabel === 'Top Assembly')) {
+      const [bottom] = children.splice(bottomIndex, 1);
+      children.splice(children.findIndex(child => child.userData.componentLabel === 'Top Assembly') + 1, 0, bottom);
+    }
     // Collapse anonymous transform wrappers, retain useful named subassemblies.
     if (!part && (!node.name || node === model || children.length === 1)) {
       children.forEach(child => appendNode(child, parentList));
@@ -228,6 +235,7 @@ function buildComponentTree() {
       visibility.className = 'component-visibility';
       const isolate = makeButton('⊙', `Isolate ${part.name}`, () => isolateComponent(part));
       isolate.className = 'component-isolate';
+      isolate.setAttribute('aria-pressed', 'false');
       row.append(select, visibility, isolate);
       item.append(row);
       part.row = row;
@@ -271,6 +279,7 @@ function updateMaterials() {
 }
 
 function selectComponent(part) {
+  cameraAnimation = null;
   selected = part;
   components.forEach(component => component.row?.querySelector('.component-select').setAttribute('aria-pressed', String(component === part)));
   $('#selectedName').textContent = part?.name || 'Select a component';
@@ -286,6 +295,7 @@ function selectComponent(part) {
 function clearSelection() { selectComponent(null); }
 
 function setComponentVisible(part, visible) {
+  isolated = null;
   part.visible = visible;
   // Hide only owned renderables, not transform parents of other selectable parts.
   part.meshes.forEach(mesh => {
@@ -299,19 +309,31 @@ function updateVisibilityUI() {
   components.forEach(part => {
     if (!part.row) return;
     part.row.dataset.hidden = String(!part.visible);
+    const isolate = part.row.querySelector('.component-isolate');
+    isolate.setAttribute('aria-pressed', String(isolated === part));
+    isolate.setAttribute('aria-label', isolated === part ? `Show all components (exit isolation of ${part.name})` : `Isolate ${part.name}`);
     const button = part.row.querySelector('.component-visibility');
     button.textContent = part.visible ? 'Hide' : 'Show';
     button.setAttribute('aria-label', `${part.visible ? 'Hide' : 'Show'} ${part.name}`);
   });
   $('#selectedVisibility').textContent = selected?.visible === false ? 'Show' : 'Hide';
+  const isIsolated = Boolean(selected && isolated === selected);
+  $('#selectedIsolate').setAttribute('aria-pressed', String(isIsolated));
+  $('#selectedIsolate').setAttribute('aria-label', isIsolated ? 'Show all components (exit isolation)' : 'Isolate selected component');
 }
 
 function isolateComponent(part) {
+  if (isolated === part) {
+    showAllComponents();
+    return;
+  }
   components.forEach(component => setComponentVisible(component, component === part));
+  isolated = part;
   selectComponent(part);
 }
 
 function showAllComponents() {
+  isolated = null;
   components.forEach(part => setComponentVisible(part, true));
 }
 
@@ -340,14 +362,19 @@ function applyExplosion(amount) {
   requestRender();
 }
 
-function setExplosionAmount(amount, immediate = false) {
+function setExplosionAmount(amount, immediate = false, frameCamera = true) {
   if (!ready) return;
   explosionTarget = THREE.MathUtils.clamp(amount, 0, 1);
   explosionAnimation = null;
   if (immediate || reducedMotion.matches) applyExplosion(explosionTarget);
   else explosionAnimation = { from: explosionAmount, to: explosionTarget, start: performance.now(), duration: 650 };
-  const direction = camera.position.clone().sub(controls.target).normalize();
-  frameModel(direction, explosionTarget, immediate || reducedMotion.matches);
+  if (frameCamera) {
+    const direction = camera.position.clone().sub(controls.target).normalize();
+    frameModel(direction, explosionTarget, immediate || reducedMotion.matches);
+  } else {
+    // Slider input takes over immediately without changing the current view.
+    cameraAnimation = null;
+  }
   requestRender();
 }
 
@@ -428,7 +455,11 @@ function resizeViewer() {
   controls?.handleResize();
   camera.aspect = width / height;
   camera.updateProjectionMatrix();
-  if (ready) frameModel(camera.position.clone().sub(controls.target).normalize(), explosionTarget, true);
+  // Inspector/tree layout changes must not refit the camera. Only a window
+  // resize needs fresh framing for a new screen size or responsive breakpoint.
+  const windowResized = windowSize[0] !== innerWidth || windowSize[1] !== innerHeight;
+  windowSize = [innerWidth, innerHeight];
+  if (ready && windowResized) frameModel(camera.position.clone().sub(controls.target).normalize(), explosionTarget, true);
   requestRender();
 }
 
@@ -459,7 +490,7 @@ function bindEvents() {
   $('#selectedIsolate').addEventListener('click', () => selected && isolateComponent(selected));
   $('#explode').addEventListener('click', () => setExplosionAmount(1));
   $('#assemble').addEventListener('click', () => setExplosionAmount(0));
-  $('#explosion').addEventListener('input', event => setExplosionAmount(Number(event.target.value) / 100, true));
+  $('#explosion').addEventListener('input', event => setExplosionAmount(Number(event.target.value) / 100, true, false));
   $('#reset').addEventListener('click', resetViewer);
   $('#wireframe').addEventListener('click', () => {
     wireframe = !wireframe;
@@ -587,7 +618,7 @@ function exposeDiagnostics() {
         }
       });
       return {
-        ready, selected: selected?.id ?? null, explosionAmount, wireframe, currentPreset,
+        ready, selected: selected?.id ?? null, isolated: isolated?.id ?? null, explosionAmount, wireframe, currentPreset,
         animating: Boolean(cameraAnimation || explosionAnimation),
         camera: camera.position.toArray(), target: controls.target.toArray(),
         up: camera.up.toArray(), modelRotation: model.rotation.toArray().slice(0, 3),
@@ -596,6 +627,7 @@ function exposeDiagnostics() {
         allBoundsFit: corners.every(([x, y, z]) => Math.abs(x) <= 1 && Math.abs(y) <= 1 && z >= -1 && z <= 1),
         components: components.map(part => ({
           id: part.id, name: part.name, sourceName: part.sourceName, visible: part.visible,
+          meshCount: part.meshes.length, bounds: { min: part.bounds.min.toArray(), max: part.bounds.max.toArray() },
           hardware: part.hardware, listed: Boolean(part.row), explosionGroup: part.explosionGroup, offset: part.offset.toArray(),
           position: part.node.position.toArray(), originalPosition: part.originalPosition.toArray(),
           worldPosition: part.node.getWorldPosition(new THREE.Vector3()).toArray(),

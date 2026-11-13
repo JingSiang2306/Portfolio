@@ -2,6 +2,7 @@
 // Install playwright-core outside the website and set PLAYWRIGHT_MODULE to its
 // index.mjs, plus CHROME_PATH if Chrome is not in the usual Windows location.
 import assert from 'node:assert/strict';
+import { verifyViewerInteractions } from '../tests/viewer-interactions.mjs';
 import { createServer } from 'node:http';
 import { readFile, stat, mkdir, mkdtemp } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
@@ -49,8 +50,8 @@ if (!process.argv.includes('--serve')) {
     const settled = () => page.waitForFunction(() => !viewerDebug.snapshot().animating);
     const click = async selector => { await page.locator(selector).click(); await settled(); };
     let state = await snapshot();
-    assert.equal(state.components.length, 163);
-    assert.equal(new Set(state.components.map(part => part.name)).size, 163);
+    assert.equal(state.components.length, 54);
+    assert.equal(new Set(state.components.map(part => part.name)).size, 54);
     assert(state.components.every(part => part.name.length <= 22 && !part.name.includes('.step')));
     assert(Math.abs(state.modelRotation[2] - Math.PI) < 1e-10);
     const modelBytes = await readFile(modelPath);
@@ -63,8 +64,9 @@ if (!process.argv.includes('--serve')) {
     assert(state.components.every(part => part.listed === !part.hardware && part.visible));
     assert.equal(await page.locator('.component-row').count(), state.components.filter(part => part.listed).length);
     assert.equal(Number(await page.locator('#componentCount').innerText()), state.components.filter(part => part.listed).length);
+    await verifyViewerInteractions(page, '01');
     await page.screenshot({ path: join(output, 'desktop.png'), fullPage: true });
-    console.log('PASS: GLB load, 163 parts, all node/mesh short names, upright correction, initial bounds fit');
+    console.log('PASS: GLB load, 54 selectable parts, all node/mesh short names, upright correction, initial bounds fit');
 
     for (const [name, direction] of Object.entries({ ISO: [1, 0.8, 1], FRONT: [0, 0, 1], TOP: [0, 1, 0], RIGHT: [1, 0, 0] })) {
       await click(`[data-view="${name}"]`);

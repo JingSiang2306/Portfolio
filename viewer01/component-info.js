@@ -1,6 +1,12 @@
 ﻿// Keys are short GLB node names. Original CAD names remain in the inspector and
 // models/component-names.json. Optional displayName overrides work for any part.
 export const COMPONENT_INFO = {
+  'Camera V3': { rigid: true, description: 'Complete Camera V3 module with Sony IMX708 sensor.' },
+  'Solar Charger': { rigid: true, description: 'Complete solar charger module.' },
+  'Pi 5': { rigid: true, description: 'Complete Raspberry Pi 5 board.' },
+  'SSD HAT': { rigid: true, description: 'Complete PCIe HAT with NVMe SSD.' },
+  'Pi Cooler': { rigid: true, description: 'Complete Raspberry Pi 5 cooler.' },
+  'Case Fan Assembly': { rigid: true, displayName: 'Case Fan', description: 'Complete EF80251S1 case cooling fan.' },
   Mic: { description: 'BY-MM1 microphone.' },
   'Camera V2': { description: 'Camera V2.1 module.' },
   'IR Board': { description: 'Infrared board.' },
